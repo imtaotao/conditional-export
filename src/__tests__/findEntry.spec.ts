@@ -4,7 +4,12 @@ describe("findEntry", () => {
   it("string export", () => {
     expect(findEntry("")).toBe("");
     expect(findEntry("./a.js")).toBe("./a.js");
-    expect(findEntry(true as any)).toBe(null);
+    expect(findEntry(0)).toBe(null);
+    expect(findEntry(1)).toBe(null);
+    expect(findEntry(true)).toBe(null);
+    expect(findEntry(false)).toBe(null);
+    expect(findEntry(null)).toBe(null);
+    expect(findEntry(undefined)).toBe(null);
   });
 
   // Can check array path

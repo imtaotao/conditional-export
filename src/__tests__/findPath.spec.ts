@@ -4,9 +4,12 @@ describe("findPath", () => {
   it("error check", () => {
     expect(() => findPath("", {})).toThrow();
     expect(() => findPath("a", {})).toThrow();
+    expect(() => findPath(0 as any, {})).toThrow();
     expect(() => findPath(1 as any, {})).toThrow();
-    expect(() => findPath(null as any, {})).toThrow();
     expect(() => findPath(true as any, {})).toThrow();
+    expect(() => findPath(false as any, {})).toThrow();
+    expect(() => findPath(null as any, {})).toThrow();
+    expect(() => findPath(undefined as any, {})).toThrow();
   });
 
   it("path check", () => {

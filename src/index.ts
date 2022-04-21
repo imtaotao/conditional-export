@@ -1,10 +1,10 @@
 // https://github.com/jkrems/proposal-pkg-exports
-type BaseType = null | string;
-type Exports = string | null | Array<Exports> | { [key: string]: Exports };
+type BaseType = null | string | number | boolean | undefined;
+export type Exports = BaseType | Array<Exports> | { [key: string]: Exports };
 
 const defaultConditions = ["require"];
 
-const valid = (value: BaseType) => {
+const valid = (value: null | string) => {
   if (typeof value !== "string") return null;
   if (!value.startsWith("./")) return null;
   return value;
@@ -14,7 +14,7 @@ const detailValue = (
   exps: Exports,
   conditions: Array<string>,
   data?: Array<string>
-): BaseType => {
+): null | string => {
   if (exps === null) {
     return null;
   } else if (typeof exps === "string") {
@@ -155,6 +155,10 @@ export const findEntry = (exps: Exports, conditions = defaultConditions) => {
   if (typeof exps === "string") {
     return exps;
   } else if (!exps) {
+    return null;
+  } else if (typeof exps === "number") {
+    return null;
+  } else if (typeof exps === "boolean") {
     return null;
   } else if (Array.isArray(exps)) {
     return detailValue(exps, conditions);
