@@ -1,0 +1,46 @@
+{
+  "name": "node-package-exports",
+  "version": "0.0.1",
+  "description": "find node package entry or path in exports",
+  "main": "dist/entry.cjs.js",
+  "unpkg": "dist/entry.umd.js",
+  "module": "dist/entry.esm-builder.js",
+  "types": "dist/src/index.d.ts",
+  "scripts": {
+    "test": "jest",
+    "build": "rollup --config",
+    "format": "prettier --write --parser typescript \"src/**/*.(js|ts?(x))\""
+  },
+  "author": "imtaotao",
+  "keywords": [
+    "node",
+    "node-package",
+    "entry",
+    "path",
+    "require"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imtaotao/node-package-exports.git"
+  },
+  "bugs": {
+    "url": "https://github.com/imtaotao/node-package-exports/issues"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^13.1.3",
+    "@types/jest": "^27.4.0",
+    "jest": "^27.5.1",
+    "prettier": "^2.5.1",
+    "rollup": "^2.67.2",
+    "rollup-plugin-cleanup": "^3.2.1",
+    "rollup-plugin-typescript2": "^0.31.1",
+    "ts-jest": "^27.1.3",
+    "typescript": "^4.5.5"
+  }
+}

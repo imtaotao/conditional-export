@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Node package exports</title>
+</head>
+<body>
+  <script src="./dist/entry.umd.js"></script>
+  <script>
+    const exports = {
+      '.': {
+        require: './index.cjs',
+        development: './index.development.js',
+        default: './index.js',
+      },
+      './lib/*': {
+        require: './src/*.cjs',
+        development: './src/*.development.js',
+        default: './src/*.js',
+      },
+    }
+
+    const { findPath, findEntry } = NodePackageExports;
+
+    console.log(findEntry(exports)); // ./index.cjs
+    console.log(findEntry(exports, ['development'])); // ./index.development.js
+    console.log(findEntry(exports, ['production'])); // ./index.js
+
+    console.log(findPath('./lib/index', exports)); // ./src/index.cjs
+    console.log(findPath('./lib/index', exports, ['development'])); // ./src/index.development.js
+    console.log(findPath('./lib/index', exports, ['production'])); // ./src/index.js
+  </script>
+</body>
+</html>
