@@ -38,7 +38,7 @@ findPath('./lib/index', exps, ['development']); // ./src/index.development.js
 findPath('./lib/index', exps, ['production']); // ./src/index.js
 ```
 
-multiple conditions
+Multiple conditions.
 
 ```js
 const exps = {
@@ -47,11 +47,12 @@ const exps = {
       import: './feature-node.mjs',
       require: './feature-node.cjs',
     },
-    default: './feature.mjs',
+    default: './feature.default.mjs',
   }
 };
-expect(findPath('./a', exps)).toBe('./feature.mjs');
-expect(findPath('./a', exps, ['node', 'require'])).toBe('./feature-node.cjs');
+
+findPath('./a', exps); // './feature.default.mjs'
+findPath('./a', exps, ['node', 'require']); // './feature-node.cjs'
 ```
 
 

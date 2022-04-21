@@ -9,10 +9,18 @@
   <script src="./dist/entry.umd.js"></script>
   <script>const { findPath, findEntry } = NodePackageExports;</script>
   <script>
-    const p = findPath("./lib/index/", {
-      "./lib/": { require: "./src/" },
-    })
-    console.log(p);
+    const exps = {
+      './a': {
+        node: {
+          import: './feature-node.mjs',
+          require: './feature-node.cjs',
+        },
+        default: './feature.default.mjs',
+      }
+    };
+
+    console.log(findPath('./a', exps)); // './feature.default.mjs'
+    console.log(findPath('./a', exps, ['node', 'require'])); // './feature-node.cjs'
   </script>
 </body>
 </html>
