@@ -6,7 +6,7 @@
 </div>
 
 Find entry or path in package.json exports.
-> http://nodejs.cn/api/packages.html#conditional-exports
+> https://github.com/jkrems/proposal-pkg-exports
 
 
 ### NPM
