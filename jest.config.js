@@ -6,7 +6,6 @@ module.exports = {
   rootDir: __dirname,
   preset: 'ts-jest',
   testMatch: ['<rootDir>/src/__tests__/**/*spec.[jt]s?(x)'],
-  testEnvironment: 'jsdom',
   coverageProvider: 'v8',
   coverageDirectory: 'coverage',
   transform: { '\\.ts$': 'ts-jest' },

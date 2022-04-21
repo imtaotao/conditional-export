@@ -1,4 +1,4 @@
-<div align="center">
+<div align='center'>
 <h2>node-package-exports</h2>
 
 [![NPM version](https://img.shields.io/npm/v/node-package-exports.svg?style=flat-square)](https://www.npmjs.com/package/node-package-exports)
@@ -11,12 +11,12 @@ Find entry or path in package.json exports.
 
 ### NPM
 
-Targets default to `['require']`;
+Default conditions is `['require']`;
 
 ```js
 import { findPath, findEntry } from 'node-package-exports';
 
-const exports = {
+const exps = {
   '.': {
     require: './index.cjs',
     development: './index.development.js',
@@ -29,22 +29,53 @@ const exports = {
   },
 }
 
-findEntry(exports); // ./index.cjs
-findEntry(exports, ['development']); // ./index.development.js
-findEntry(exports, ['production']); // ./index.js
+findEntry(exps); // ./index.cjs
+findEntry(exps, ['development']); // ./index.development.js
+findEntry(exps, ['production']); // ./index.js
 
-findPath('./lib/index', exports); // ./src/index.cjs
-findPath('./lib/index', exports, ['development']); // ./src/index.development.js
-findPath('./lib/index', exports, ['production']); // ./src/index.js
+findPath('./lib/index', exps); // ./src/index.cjs
+findPath('./lib/index', exps, ['development']); // ./src/index.development.js
+findPath('./lib/index', exps, ['production']); // ./src/index.js
 ```
+
+multiple conditions
+
+```js
+const exps = {
+  './a': {
+    node: {
+      import: './feature-node.mjs',
+      require: './feature-node.cjs',
+    },
+    default: './feature.mjs',
+  }
+};
+expect(findPath('./a', exps)).toBe('./feature.mjs');
+expect(findPath('./a', exps, ['node', 'require'])).toBe('./feature-node.cjs');
+```
+
+
+### Extended usage
+
+When you don't know if path exists, you can wrap it like this. 
+Because `findPath` does not conditionally match the first-level structure, but `findEntry` will.
+
+```js
+const find = (path, exps, conditions) => {
+  return path
+    ? findPath(path, exps, conditions)
+    : findEntry(exps, conditions);
+}
+```
+
 
 ### CDN
 
 ```html
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 <body>
-  <script src="https://unpkg.com/node-package-exports/dist/entry.umd.js"></script>
+  <script src='https://unpkg.com/node-package-exports/dist/entry.umd.js'></script>
   <script>
     const { findPath, findEntry } = NodePackageExports;
     // ...

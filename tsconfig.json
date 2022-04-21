@@ -4,7 +4,7 @@
     "rootDir": ".",
     "outDir": "dist",
     "module": "ESNext",
-    "target": "es2016",
+    "target": "es5",
     "strict": true,
     "resolveJsonModule": true,
     "lib": ["es6", "dom"],
@@ -13,9 +13,7 @@
     "sourceMap": true,
     "declaration": true,
     "noImplicitThis": true,
-    "esModuleInterop": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
+    "esModuleInterop": true
   },
   "include": ["src"]
 }

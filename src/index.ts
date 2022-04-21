@@ -1,8 +1,8 @@
 // https://github.com/jkrems/proposal-pkg-exports
 type BaseType = null | string;
-type Exports = string | Array<Exports> | { [key: string]: Exports };
+type Exports = string | null | Array<Exports> | { [key: string]: Exports };
 
-const defaultTargets = ["require"];
+const defaultConditions = ["require"];
 
 const valid = (value: BaseType) => {
   if (typeof value !== "string") return null;
@@ -11,16 +11,18 @@ const valid = (value: BaseType) => {
 };
 
 const detailValue = (
-  exports: Exports,
-  targets: Array<string>,
+  exps: Exports,
+  conditions: Array<string>,
   data?: Array<string>
 ): BaseType => {
-  if (typeof exports === "string") {
+  if (exps === null) {
+    return null;
+  } else if (typeof exps === "string") {
     if (!data || !data.length) {
-      return valid(exports);
+      return valid(exps);
     }
     let result = "";
-    const parts = exports.split(/\*+/);
+    const parts = exps.split(/\*+/);
     for (let i = 0; i < parts.length; i++) {
       result += parts[i];
       if (i !== parts.length - 1) {
@@ -28,29 +30,27 @@ const detailValue = (
       }
     }
     return valid(result);
-  } else if (Array.isArray(exports)) {
-    for (const val of exports) {
-      const result = detailValue(val, targets, data);
+  } else if (Array.isArray(exps)) {
+    for (const val of exps) {
+      const result = detailValue(val, conditions, data);
       if (result) return result;
     }
     return null;
-  } else if (typeof exports === "object") {
+  } else if (typeof exps === "object") {
     let result;
-    for (const key of targets) {
-      result = detailValue(exports[key], targets, data);
-      if (result) return result;
+    const keys = Object.keys(exps);
+    for (const key of keys) {
+      if (key === "default" || conditions.includes(key)) {
+        result = detailValue(exps[key], conditions, data);
+        if (result) return result;
+      }
     }
-    return detailValue(exports["default"], targets, data);
   }
   return null;
 };
 
 // 模糊匹配
 const fuzzyMatch = (path: string, keys: Array<string>) => {
-  let matched;
-  const data = [];
-  const pathLen = path.length;
-
   const findNextKeyIdx = (key: string, idx: number) => {
     for (let i = idx; i < key.length; i++) {
       if (key[i] !== "*") return i;
@@ -64,12 +64,18 @@ const fuzzyMatch = (path: string, keys: Array<string>) => {
     return -1;
   };
 
+  let prefix;
+  let matched;
+  const data = [];
+  const pathLen = path.length;
+
   keys = keys.sort((a, b) => b.length - a.length);
 
   for (const key of keys) {
     if (matched) break;
     let i = 0;
     let j = 0;
+
     for (i = 0; i < pathLen; i++) {
       if (path[i] === key[j]) {
         j++;
@@ -84,49 +90,76 @@ const fuzzyMatch = (path: string, keys: Array<string>) => {
         break;
       }
     }
+
     if (j < key.length) {
       data.length = 0;
+    } else if (i < pathLen) {
+      if (key.endsWith("/")) {
+        matched = key;
+        prefix = path.slice(0, i);
+      } else {
+        data.length = 0;
+      }
     } else {
       matched = key;
+      prefix = path.slice(0, i);
     }
   }
-
-  return [matched, data] as const;
+  return [matched, prefix, data] as const;
 };
 
-// The first layer may be conditional mapping
 export const findPath = (
   path: string,
-  exports: Record<string, Exports>,
-  targets = defaultTargets
+  exps: Record<string, Exports>,
+  conditions = defaultConditions
 ) => {
   if (path !== "." && !path.startsWith("./")) {
     throw new TypeError("path must be `.` or start with `./`");
   }
-  if (!exports) return null;
-  if (Array.isArray(exports)) return null;
-  if (typeof exports !== "object") return null;
+  if (!exps) return null;
+  if (Array.isArray(exps)) return null;
+  if (typeof exps !== "object") return null;
+
   let result = null;
-  if (exports[path]) {
-    result = detailValue(exports[path], targets);
+  let matchKey = null;
+  let matchPrefix = null;
+
+  if (exps[path]) {
+    matchKey = path;
+    matchPrefix = path;
+    result = detailValue(exps[path], conditions);
   } else {
-    const [key, data] = fuzzyMatch(path, Object.keys(exports));
-    if (key) result = detailValue(exports[key], targets, data);
+    // When looking for path, we must match, no conditional match is required
+    const [key, prefix, data] = fuzzyMatch(path, Object.keys(exps));
+    if (key) {
+      matchKey = key;
+      matchPrefix = prefix;
+      result = detailValue(exps[key], conditions, data);
+    }
   }
-  if (result && path.endsWith('/') && !result.endsWith('/')) {
-    return null;
+
+  if (result) {
+    // If is dir match, the return must be dir
+    const keyIsDir = matchKey!.endsWith("/");
+    const resultIsDir = result.endsWith("/");
+    if (keyIsDir && !resultIsDir) return null;
+    if (!keyIsDir && resultIsDir) return null;
+    if (path !== matchPrefix) {
+      result += path.slice(matchPrefix!.length);
+    }
   }
   return result;
 };
 
-export const findEntry = (exports: Exports, targets = defaultTargets) => {
-  if (typeof exports === "string") {
-    return exports;
-  } else if (!exports) {
+export const findEntry = (exps: Exports, conditions = defaultConditions) => {
+  if (typeof exps === "string") {
+    return exps;
+  } else if (!exps) {
     return null;
-  } else if (Array.isArray(exports)) {
-    return detailValue(exports, targets);
+  } else if (Array.isArray(exps)) {
+    return detailValue(exps, conditions);
   } else {
-    return findPath(".", exports, targets);
+    // If syntactic sugar doesn't exist, try conditional match
+    return findPath(".", exps, conditions) || detailValue(exps, conditions);
   }
 };
