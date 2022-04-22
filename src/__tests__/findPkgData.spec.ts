@@ -9,7 +9,7 @@ describe("findPkgData", () => {
       "./timezones/utc": "./data/timezones/utc/index.mjs",
       "./core-polyfill": ["std:core-module", "./core-polyfill.js"],
     };
-    const data = findPkgData("@momentjs/moment/timezones/pdt.mjs", exports);
+    const data = findPkgData("@momentjs/moment/timezones/pdt.mjs", { exports });
     expect(data).toMatchObject({
       name: "@momentjs/moment",
       version: "",

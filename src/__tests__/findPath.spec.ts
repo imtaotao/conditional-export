@@ -1,30 +1,30 @@
-import { findPath } from "../index";
+import { findPathInExports } from "../index";
 
-describe("findPath", () => {
+describe("findPathInExports", () => {
   it("error check", () => {
-    expect(() => findPath("", {})).toThrow();
-    expect(() => findPath("a", {})).toThrow();
-    expect(() => findPath(0 as any, {})).toThrow();
-    expect(() => findPath(1 as any, {})).toThrow();
-    expect(() => findPath(true as any, {})).toThrow();
-    expect(() => findPath(false as any, {})).toThrow();
-    expect(() => findPath(null as any, {})).toThrow();
-    expect(() => findPath(undefined as any, {})).toThrow();
+    expect(() => findPathInExports("", {})).toThrow();
+    expect(() => findPathInExports("a", {})).toThrow();
+    expect(() => findPathInExports(0 as any, {})).toThrow();
+    expect(() => findPathInExports(1 as any, {})).toThrow();
+    expect(() => findPathInExports(true as any, {})).toThrow();
+    expect(() => findPathInExports(false as any, {})).toThrow();
+    expect(() => findPathInExports(null as any, {})).toThrow();
+    expect(() => findPathInExports(undefined as any, {})).toThrow();
   });
 
   it("path check", () => {
     expect(
-      findPath("./lib", {
+      findPathInExports("./lib", {
         "./lib": { require: "./src" },
       })
     ).toBe("./src");
     expect(
-      findPath("./lib/index", {
+      findPathInExports("./lib/index", {
         "./lib": { require: "./src" },
       })
     ).toBe(null);
     expect(
-      findPath("./lib", {
+      findPathInExports("./lib", {
         "./lib/a": { require: "./src/a" },
       })
     ).toBe(null);
@@ -32,27 +32,27 @@ describe("findPath", () => {
 
   it("dir check", () => {
     expect(
-      findPath("./lib/", {
+      findPathInExports("./lib/", {
         "./lib/": { require: "./src/" },
       })
     ).toBe("./src/");
     expect(
-      findPath("./lib/", {
+      findPathInExports("./lib/", {
         "./lib": { require: "./src" },
       })
     ).toBe(null);
     expect(
-      findPath("./lib/", {
+      findPathInExports("./lib/", {
         "./lib": { require: "./src/" },
       })
     ).toBe(null);
     expect(
-      findPath("./lib/", {
+      findPathInExports("./lib/", {
         "./lib/": { require: "./src" },
       })
     ).toBe(null);
     expect(
-      findPath("./lib/index/", {
+      findPathInExports("./lib/index/", {
         "./lib/": { require: "./src/" },
       })
     ).toBe("./src/index/");
@@ -62,16 +62,20 @@ describe("findPath", () => {
     const exports = {
       "./": "./src/utils/",
     };
-    expect(findPath("./tick.js", exports)).toBe("./src/utils/tick.js");
-    expect(findPath("./a/tick.js", exports)).toBe("./src/utils/a/tick.js");
+    expect(findPathInExports("./tick.js", exports)).toBe("./src/utils/tick.js");
+    expect(findPathInExports("./a/tick.js", exports)).toBe(
+      "./src/utils/a/tick.js"
+    );
   });
 
   it("root match", () => {
     const exports = {
       "./*": "./src/utils/*",
     };
-    expect(findPath("./tick.js", exports)).toBe("./src/utils/tick.js");
-    expect(findPath("./a/tick.js", exports)).toBe("./src/utils/a/tick.js");
+    expect(findPathInExports("./tick.js", exports)).toBe("./src/utils/tick.js");
+    expect(findPathInExports("./a/tick.js", exports)).toBe(
+      "./src/utils/a/tick.js"
+    );
   });
 
   it("condition export", () => {
@@ -82,11 +86,11 @@ describe("findPath", () => {
         default: "./src/core.js",
       },
     };
-    expect(findPath("./lib/index", exports)).toBe("./src/core.cjs");
-    expect(findPath("./lib/index", exports, ["development"])).toBe(
+    expect(findPathInExports("./lib/index", exports)).toBe("./src/core.cjs");
+    expect(findPathInExports("./lib/index", exports, ["development"])).toBe(
       "./src/core.development.js"
     );
-    expect(findPath("./lib/index", exports, ["production"])).toBe(
+    expect(findPathInExports("./lib/index", exports, ["production"])).toBe(
       "./src/core.js"
     );
   });
@@ -101,8 +105,8 @@ describe("findPath", () => {
         default: "./feature.mjs",
       },
     };
-    expect(findPath("./a", exports)).toBe("./feature.mjs");
-    expect(findPath("./a", exports, ["node", "require"])).toBe(
+    expect(findPathInExports("./a", exports)).toBe("./feature.mjs");
+    expect(findPathInExports("./a", exports, ["node", "require"])).toBe(
       "./feature-node.cjs"
     );
   });
@@ -115,48 +119,48 @@ describe("findPath", () => {
         default: "./src/*.js",
       },
     };
-    expect(findPath("./lib/index", exports)).toBe("./src/index.cjs");
-    expect(findPath("./lib/index", exports, ["development"])).toBe(
+    expect(findPathInExports("./lib/index", exports)).toBe("./src/index.cjs");
+    expect(findPathInExports("./lib/index", exports, ["development"])).toBe(
       "./src/index.development.js"
     );
-    expect(findPath("./lib/index", exports, ["production"])).toBe(
+    expect(findPathInExports("./lib/index", exports, ["production"])).toBe(
       "./src/index.js"
     );
   });
 
   it("multiple * matches", () => {
     expect(
-      findPath("./lib/taox/index", {
+      findPathInExports("./lib/taox/index", {
         "./lib/*x/*": { require: "./src/*.cjs*" },
       })
     ).toBe("./src/tao.cjsindex");
     expect(
-      findPath("./lib/taox/indexa", {
+      findPathInExports("./lib/taox/indexa", {
         "./lib/*x/*a": { require: "./src/*.cjs*a" },
       })
     ).toBe("./src/tao.cjsindexa");
     expect(
-      findPath("./lib/taox/indexa", {
+      findPathInExports("./lib/taox/indexa", {
         "./lib/*x/*a": { require: "./src/*.cjs*a*" },
       })
     ).toBe("./src/tao.cjsindexa");
     expect(
-      findPath("./lib/taox/index", {
+      findPathInExports("./lib/taox/index", {
         "./lib/*x/*": { require: "./src/*.cjs" },
       })
     ).toBe("./src/tao.cjs");
     expect(
-      findPath("./lib/taox/index", {
+      findPathInExports("./lib/taox/index", {
         "./lib/**x/*": { require: "./src/**.cjs" },
       })
     ).toBe("./src/tao.cjs");
     expect(
-      findPath("./lib/taox/index", {
+      findPathInExports("./lib/taox/index", {
         "./lib/**x/*": { require: "./src/*.cjs" },
       })
     ).toBe("./src/tao.cjs");
     expect(
-      findPath("./lib/taox/index", {
+      findPathInExports("./lib/taox/index", {
         "./lib/*x/*": { require: "./src/**.cjs" },
       })
     ).toBe("./src/tao.cjs");
@@ -164,17 +168,17 @@ describe("findPath", () => {
 
   it("match dir", () => {
     expect(
-      findPath("./lib/index/", {
+      findPathInExports("./lib/index/", {
         "./lib/*/": { require: "./src/*/" },
       })
     ).toBe("./src/index/");
     expect(
-      findPath("./lib/index/", {
+      findPathInExports("./lib/index/", {
         "./lib/*": { require: "./src/*" },
       })
     ).toBe(null);
     expect(
-      findPath("./lib/index/", {
+      findPathInExports("./lib/index/", {
         "./lib/*/": { require: "./src/*" },
       })
     ).toBe(null);
@@ -185,8 +189,12 @@ describe("findPath", () => {
       "./features/*": "./src/features/*.js",
       "./features/private-internal/*": null,
     };
-    expect(findPath("./features/private-internal/m", exports)).toBe(null);
-    expect(findPath("./features/x", exports)).toBe("./src/features/x.js");
+    expect(findPathInExports("./features/private-internal/m", exports)).toBe(
+      null
+    );
+    expect(findPathInExports("./features/x", exports)).toBe(
+      "./src/features/x.js"
+    );
   });
 
   it("deep nested", () => {
@@ -209,7 +217,9 @@ describe("findPath", () => {
         },
       },
     };
-    expect(findPath("./a", exports, ["node", "require"])).toBe("./b.js");
+    expect(findPathInExports("./a", exports, ["node", "require"])).toBe(
+      "./b.js"
+    );
   });
 
   it("deep nested match", () => {
@@ -232,7 +242,7 @@ describe("findPath", () => {
         },
       },
     };
-    expect(findPath("./a/index", exports, ["node", "require"])).toBe(
+    expect(findPathInExports("./a/index", exports, ["node", "require"])).toBe(
       "./src/index.js"
     );
   });
@@ -257,6 +267,6 @@ describe("findPath", () => {
         },
       },
     };
-    expect(findPath("./a", exports, ["node", "require"])).toBe(null);
+    expect(findPathInExports("./a", exports, ["node", "require"])).toBe(null);
   });
 });

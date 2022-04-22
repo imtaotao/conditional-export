@@ -129,7 +129,7 @@ const fuzzyMatchKey = (path: string, keys: Array<string>) => {
   return [matched, prefix, data] as const;
 };
 
-export const findPath = (
+export const findPathInExports = (
   path: string,
   exps: Exports,
   conditions = defaultConditions
@@ -170,7 +170,10 @@ export const findPath = (
   return result;
 };
 
-export const findEntry = (exps: Exports, conditions = defaultConditions) => {
+export const findEntryInExports = (
+  exps: Exports,
+  conditions = defaultConditions
+) => {
   if (typeof exps === "string") {
     return exps;
   } else if (isNativeType(exps)) {
@@ -179,18 +182,21 @@ export const findEntry = (exps: Exports, conditions = defaultConditions) => {
     return conditionMatch(exps, conditions);
   } else {
     // If syntactic sugar doesn't exist, try conditional match
-    return findPath(".", exps, conditions) || conditionMatch(exps, conditions);
+    return (
+      findPathInExports(".", exps, conditions) ||
+      conditionMatch(exps, conditions)
+    );
   }
 };
 
 export const parseModuleId = (moduleId: string) => {
-  let buf = "";
-  let slash = 0;
-  let isScope = false;
-
   let name = "";
   let path = "";
   let version = "";
+
+  let buf = "";
+  let slash = 0;
+  let isScope = false;
 
   const set = (type: string) => {
     if (type === "path") path = buf;
@@ -260,9 +266,9 @@ export const parseModuleId = (moduleId: string) => {
     path = `.${path}`;
   }
 
-  // @vue -> ''
-  // @vue/ -> ''
-  // @vue// -> ''
+  // `@vue` -> ''
+  // `@vue/` -> ''
+  // `@vue//` -> ''
   if (isScope && (slash === 0 || name[name.length - 1] === "/")) {
     name = "";
     path = "";
@@ -279,26 +285,27 @@ export const parseModuleId = (moduleId: string) => {
 
 export const findPkgData = (
   moduleId: string,
-  exps: Exports,
+  pkgJson: Record<string, any>,
   conditions = defaultConditions
 ) => {
   let path = null;
   let resolve = null;
-  let { raw, name, version, path: virtualPath } = parseModuleId(moduleId);
+  const exps: Exports = pkgJson.exports; // TODO: support imports
+  const { raw, name, version, path: virtualPath } = parseModuleId(moduleId);
+
   if (!name) {
     throw new SyntaxError(`"${raw}" is not a valid module id`);
   }
 
   path = virtualPath
-    ? findPath(virtualPath, exps, conditions)
-    : findEntry(exps, conditions);
+    ? findPathInExports(virtualPath, exps, conditions)
+    : findEntryInExports(exps, conditions);
 
   if (path) {
     // ./ => /
     // ./a => /a
     // ./a/ => /a/
-    version = version && `@${version}`;
-    resolve = `${name}${version}${path.slice(1)}`;
+    resolve = `${name}${version ? `@${version}` : ""}${path.slice(1)}`;
   }
 
   return {

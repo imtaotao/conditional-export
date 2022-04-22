@@ -8,12 +8,12 @@
 Find entry or path in package.json exports. https://github.com/jkrems/proposal-pkg-exports
 
 
-### findEntry
+### findEntryInExports
 
 Default conditions is `['require']`;
 
 ```js
-import { findEntry } from 'node-package-exports';
+import { findEntryInExports } from 'node-package-exports';
 
 const exports = {
   '.': {
@@ -23,16 +23,16 @@ const exports = {
   },
 }
 
-findEntry(exports); // ./index.cjs
-findEntry(exports, ['development']); // ./index.development.js
-findEntry(exports, ['production']); // ./index.js
+findEntryInExports(exports); // ./index.cjs
+findEntryInExports(exports, ['development']); // ./index.development.js
+findEntryInExports(exports, ['production']); // ./index.js
 ```
 
 
-### findPath
+### findPathInExports
 
 ```js
-import { findPath } from 'node-package-exports';
+import { findPathInExports } from 'node-package-exports';
 
 const exports = {
   './lib/*': {
@@ -42,15 +42,15 @@ const exports = {
   },
 }
 
-findPath('./lib/index', exports); // ./src/index.cjs
-findPath('./lib/index', exports, ['development']); // ./src/index.development.js
-findPath('./lib/index', exports, ['production']); // ./src/index.js
+findPathInExports('./lib/index', exports); // ./src/index.cjs
+findPathInExports('./lib/index', exports, ['development']); // ./src/index.development.js
+findPathInExports('./lib/index', exports, ['production']); // ./src/index.js
 ```
 
 Multiple conditions.
 
 ```js
-import { findPath } from 'node-package-exports';
+import { findPathInExports } from 'node-package-exports';
 
 const exports = {
   './a': {
@@ -62,8 +62,8 @@ const exports = {
   }
 };
 
-findPath('./a', exports); // './feature.default.mjs'
-findPath('./a', exports, ['node', 'require']); // './feature-node.cjs'
+findPathInExports('./a', exports); // './feature.default.mjs'
+findPathInExports('./a', exports, ['node', 'require']); // './feature-node.cjs'
 ```
 
 
@@ -72,13 +72,15 @@ findPath('./a', exports, ['node', 'require']); // './feature-node.cjs'
 ```js
 import { findPkgData } from 'node-package-exports';
 
-const exports = {
-  './': './src/util/',
-  './timezones/': './data/timezones/',
-  './timezones/utc': './data/timezones/utc/index.mjs',
+const pkgJson = {
+  exports: {
+    './': './src/util/',
+    './timezones/': './data/timezones/',
+    './timezones/utc': './data/timezones/utc/index.mjs',
+  }
 };
 
-const data = findPkgData('@vue/core/timezones/pdt.mjs', exports);
+const data = findPkgData('@vue/core/timezones/pdt.mjs', pkgJson);
 // {
 //   name: '@vue/core',
 //   version: '',
@@ -148,7 +150,7 @@ if (data.path) {
 <body>
   <script src='https://unpkg.com/node-package-exports/dist/entry.umd.js'></script>
   <script>
-    const { findPath, findEntry, findPkgData, parseModuleId } = NodePackageExports;
+    const { findPkgData, findPathInExports, findEntryInExports, parseModuleId } = NodePackageExports;
     // ...
   </script>
 </body>
