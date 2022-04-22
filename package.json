@@ -1,6 +1,6 @@
 {
   "name": "node-package-exports",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "find node package entry or path in exports",
   "main": "dist/entry.cjs.js",
   "unpkg": "dist/entry.umd.js",

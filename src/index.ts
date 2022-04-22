@@ -1,8 +1,29 @@
-// https://github.com/jkrems/proposal-pkg-exports
-type BaseType = null | string | number | boolean | undefined;
+export type BaseType =
+  | number
+  | bigint
+  | string
+  | symbol
+  | boolean
+  | null
+  | undefined;
 export type Exports = BaseType | Array<Exports> | { [key: string]: Exports };
+export type PkgData = ReturnType<typeof findPkgData>;
+export type ModuleIdData = ReturnType<typeof parseModuleId>;
 
 const defaultConditions = ["require"];
+
+const isNativeType = (value: any): value is BaseType => {
+  const type = typeof value;
+  return (
+    type === "number" ||
+    type === "bigint" ||
+    type === "string" ||
+    type === "symbol" ||
+    type === "boolean" ||
+    value == undefined ||
+    value === null
+  );
+};
 
 const valid = (value: null | string) => {
   if (typeof value !== "string") return null;
@@ -10,7 +31,8 @@ const valid = (value: null | string) => {
   return value;
 };
 
-const detailValue = (
+// https://github.com/jkrems/proposal-pkg-exports
+const conditionMatch = (
   exps: Exports,
   conditions: Array<string>,
   data?: Array<string>
@@ -32,7 +54,7 @@ const detailValue = (
     return valid(result);
   } else if (Array.isArray(exps)) {
     for (const val of exps) {
-      const result = detailValue(val, conditions, data);
+      const result = conditionMatch(val, conditions, data);
       if (result) return result;
     }
     return null;
@@ -41,7 +63,7 @@ const detailValue = (
     const keys = Object.keys(exps);
     for (const key of keys) {
       if (key === "default" || conditions.includes(key)) {
-        result = detailValue(exps[key], conditions, data);
+        result = conditionMatch(exps[key], conditions, data);
         if (result) return result;
       }
     }
@@ -49,7 +71,7 @@ const detailValue = (
   return null;
 };
 
-const fuzzyMatch = (path: string, keys: Array<string>) => {
+const fuzzyMatchKey = (path: string, keys: Array<string>) => {
   const findNextKeyIdx = (key: string, idx: number) => {
     for (let i = idx; i < key.length; i++) {
       if (key[i] !== "*") return i;
@@ -109,15 +131,14 @@ const fuzzyMatch = (path: string, keys: Array<string>) => {
 
 export const findPath = (
   path: string,
-  exps: Record<string, Exports>,
+  exps: Exports,
   conditions = defaultConditions
 ) => {
+  if (isNativeType(exps)) return null;
+  if (Array.isArray(exps)) return null;
   if (path !== "." && !path.startsWith("./")) {
     throw new TypeError("path must be `.` or start with `./`");
   }
-  if (!exps) return null;
-  if (Array.isArray(exps)) return null;
-  if (typeof exps !== "object") return null;
 
   let result = null;
   let matchKey = null;
@@ -126,14 +147,14 @@ export const findPath = (
   if (exps[path]) {
     matchKey = path;
     matchPrefix = path;
-    result = detailValue(exps[path], conditions);
+    result = conditionMatch(exps[path], conditions);
   } else {
     // When looking for path, we must match, no conditional match is required
-    const [key, prefix, data] = fuzzyMatch(path, Object.keys(exps));
+    const [key, prefix, data] = fuzzyMatchKey(path, Object.keys(exps));
     if (key) {
       matchKey = key;
       matchPrefix = prefix;
-      result = detailValue(exps[key], conditions, data);
+      result = conditionMatch(exps[key], conditions, data);
     }
   }
   if (result) {
@@ -152,17 +173,13 @@ export const findPath = (
 export const findEntry = (exps: Exports, conditions = defaultConditions) => {
   if (typeof exps === "string") {
     return exps;
-  } else if (!exps) {
-    return null;
-  } else if (typeof exps === "number") {
-    return null;
-  } else if (typeof exps === "boolean") {
+  } else if (isNativeType(exps)) {
     return null;
   } else if (Array.isArray(exps)) {
-    return detailValue(exps, conditions);
+    return conditionMatch(exps, conditions);
   } else {
     // If syntactic sugar doesn't exist, try conditional match
-    return findPath(".", exps, conditions) || detailValue(exps, conditions);
+    return findPath(".", exps, conditions) || conditionMatch(exps, conditions);
   }
 };
 
@@ -257,5 +274,38 @@ export const parseModuleId = (moduleId: string) => {
     path,
     version,
     raw: moduleId,
+  };
+};
+
+export const findPkgData = (
+  moduleId: string,
+  exps: Exports,
+  conditions = defaultConditions
+) => {
+  let path = null;
+  let resolve = null;
+  let { raw, name, version, path: realPath } = parseModuleId(moduleId);
+  if (!name) {
+    throw new SyntaxError(`"${raw}" is not a valid module id`);
+  }
+
+  path = realPath
+    ? findPath(realPath, exps, conditions)
+    : findEntry(exps, conditions);
+
+  if (path) {
+    // ./ => /
+    // ./a => /a
+    // ./a/ => /a/
+    version = version && `@${version}`;
+    resolve = `${name}${version}${path.slice(1)}`;
+  }
+
+  return {
+    raw,
+    name,
+    path,
+    version,
+    resolve,
   };
 };

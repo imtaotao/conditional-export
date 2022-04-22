@@ -9,14 +9,14 @@ Find entry or path in package.json exports.
 > https://github.com/jkrems/proposal-pkg-exports
 
 
-### NPM
+### findEntry
 
 Default conditions is `['require']`;
 
 ```js
-import { findPath, findEntry } from 'node-package-exports';
+import { findEntry } from 'node-package-exports';
 
-const exps = {
+const exports = {
   '.': {
     require: './index.cjs',
     development: './index.development.js',
@@ -29,19 +29,36 @@ const exps = {
   },
 }
 
-findEntry(exps); // ./index.cjs
-findEntry(exps, ['development']); // ./index.development.js
-findEntry(exps, ['production']); // ./index.js
+findEntry(exports); // ./index.cjs
+findEntry(exports, ['development']); // ./index.development.js
+findEntry(exports, ['production']); // ./index.js
+```
 
-findPath('./lib/index', exps); // ./src/index.cjs
-findPath('./lib/index', exps, ['development']); // ./src/index.development.js
-findPath('./lib/index', exps, ['production']); // ./src/index.js
+
+### findPath
+
+```js
+import { findPath } from 'node-package-exports';
+
+const exports = {
+  './lib/*': {
+    require: './src/*.cjs',
+    development: './src/*.development.js',
+    default: './src/*.js',
+  },
+}
+
+findPath('./lib/index', exports); // ./src/index.cjs
+findPath('./lib/index', exports, ['development']); // ./src/index.development.js
+findPath('./lib/index', exports, ['production']); // ./src/index.js
 ```
 
 Multiple conditions.
 
 ```js
-const exps = {
+import { findPath } from 'node-package-exports';
+
+const exports = {
   './a': {
     node: {
       import: './feature-node.mjs',
@@ -51,22 +68,81 @@ const exps = {
   }
 };
 
-findPath('./a', exps); // './feature.default.mjs'
-findPath('./a', exps, ['node', 'require']); // './feature-node.cjs'
+findPath('./a', exports); // './feature.default.mjs'
+findPath('./a', exports, ['node', 'require']); // './feature-node.cjs'
+```
+
+
+### findPkgData
+
+```js
+import { findPkgData } from 'node-package-exports';
+
+const exports = {
+  './': './src/util/',
+  './timezones/': './data/timezones/',
+  './timezones/utc': './data/timezones/utc/index.mjs',
+};
+
+const data = findPkgData('@vue/core/timezones/pdt.mjs', exports);
+// {
+//   name: '@vue/core',
+//   version: '',
+//   path: './data/timezones/pdt.mjs',
+//   resolve: '@vue/core/data/timezones/pdt.mjs',
+//   raw: '@vue/core/timezones/pdt.mjs',
+// }
+
+// If the module doesn't exist, you should throw an error.
+if (!data.path) {
+  throw new Error(`Module '${data.raw}' Not Found`);
+}
+```
+
+
+### parseModuleId
+
+```js
+import { parseModuleId } from 'node-package-exports';
+
+parseModuleId('vue')
+// {
+//   name: 'vue',
+//   path: '',
+//   version: '',
+//   raw: 'vue',
+// }
+
+parseModuleId('vue/');
+// {
+//   name: 'vue',
+//   path: './',
+//   version: '',
+//   raw: 'vue/',
+// }
+
+parseModuleId('@vue/core@v1.0.0/a.js');
+// {
+//   name: '@vue/core',
+//   path: './a.js',
+//   version: 'v1.0.0',
+//   raw: '@vue/core@v1.0.0/a.js',
+// }
 ```
 
 
 ### Extended usage
 
-When you don't know if path exists, you can wrap it like this. 
-Because `findPath` does not conditionally match the first-level structure, but `findEntry` will.
+When you want to convert to absolute path, you can handle it like this.
 
 ```js
-const find = (exps, conditions, path) => {
-  return path
-    ? findPath(path, exps, conditions)
-    : findEntry(exps, conditions);
-}
+import { findPkgData } from 'node-package-exports';
+
+const data = findPkgData('vue/src/index.js', { ... })
+// NodeJs
+const resolvePath = path.resolve(pkgDir, data.path);
+// Browser
+const resolveUrl = new URL(data.path, pkgDir).href;
 ```
 
 
@@ -78,9 +154,14 @@ const find = (exps, conditions, path) => {
 <body>
   <script src='https://unpkg.com/node-package-exports/dist/entry.umd.js'></script>
   <script>
-    const { findPath, findEntry } = NodePackageExports;
+    const { findPath, findEntry, findPkgData, parseModuleId } = NodePackageExports;
     // ...
   </script>
 </body>
 </html>
 ```
+
+
+## TODO
+
+1. [Support imports Field](https://github.com/jkrems/proposal-pkg-exports#3-imports-field)
