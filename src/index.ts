@@ -299,7 +299,7 @@ export const findPkgData = (
 ) => {
   let path = null;
   let resolve = null;
-  const exps: Exports = pkgJson.exports; // TODO: support imports
+  const exps = pkgJson.exports;
   const { raw, name, version, path: virtualPath } = parseModuleId(moduleId);
 
   if (!name) {
@@ -311,11 +311,11 @@ export const findPkgData = (
   path = virtualPath
     ? findPathInExports(virtualPath, exps, conditions)
     : findEntryInExports(exps, conditions);
-
+  
+  // ./ => /
+  // ./a => /a
+  // ./a/ => /a/
   if (path) {
-    // ./ => /
-    // ./a => /a
-    // ./a/ => /a/
     resolve = `${name}${version ? `@${version}` : ""}${path.slice(1)}`;
   }
 
