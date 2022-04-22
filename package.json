@@ -17,6 +17,8 @@
     "node-package",
     "entry",
     "path",
+    "exports",
+    "imports",
     "require"
   ],
   "license": "MIT",
