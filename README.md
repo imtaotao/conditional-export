@@ -5,8 +5,7 @@
 
 </div>
 
-Find entry or path in package.json exports.
-> https://github.com/jkrems/proposal-pkg-exports
+Find entry or path in package.json exports. https://github.com/jkrems/proposal-pkg-exports
 
 
 ### findEntry
