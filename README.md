@@ -86,11 +86,6 @@ const data = findPkgData('@vue/core/timezones/pdt.mjs', exports);
 //   resolve: '@vue/core/data/timezones/pdt.mjs',
 //   raw: '@vue/core/timezones/pdt.mjs',
 // }
-
-// If the module doesn't exist, you should throw an error.
-if (!data.path) {
-  throw new Error(`Module '${data.raw}' Not Found`);
-}
 ```
 
 
@@ -132,11 +127,16 @@ When you want to convert to absolute path, you can handle it like this.
 ```js
 import { findPkgData } from 'node-package-exports';
 
-const data = findPkgData('vue/src/index.js', { ... })
-// NodeJs
-const resolvePath = path.resolve(pkgDir, data.path);
-// Browser
-const resolveUrl = new URL(data.path, pkgDir).href;
+const data = findPkgData('vue/src/index.js', { ... }, ['require', ...]);
+
+if (data.path) {
+  const resolvePath = isNodeEnv
+    ? path.resolve(pkgDir, data.path) // NodeJs
+    : new URL(data.path, pkgDir).href; // Browser
+} else {
+  // If the module doesn't exist, you should throw an error.
+  throw new Error(`Module '${data.raw}' Not Found`);
+}
 ```
 
 
