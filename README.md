@@ -131,7 +131,7 @@ import { findPkgData } from 'node-package-exports';
 
 const data = findPkgData('vue/src/index.js', { ... }, ['require', ...]);
 
-if (data.path) {
+if (data.path !== null) {
   const resolvePath = isNodeEnv
     ? path.resolve(pkgDir, data.path) // NodeJs
     : new URL(data.path, pkgDir).href; // Browser

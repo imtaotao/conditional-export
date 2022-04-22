@@ -9,11 +9,14 @@
   <script src="./dist/entry.umd.js"></script>
   <script>const { parseModuleId, findPkgData, findEntryInExports, findPathInExports } = NodePackageExports;</script>
   <script>
-    const data = parseModuleId('@vue/core@v1.0.0/a.js')
-    console.log(data);
-    
-    const p = new URL(data.path, 'file:///Users/bytedance/Desktop/github/node-package-exports/index.html')
-    console.log(p);
+     const pkgJson = {
+      name: "a-package",
+      exports: {
+        ".": "./main.mjs",
+        "./foo": "./foo.js",
+      },
+    };
+   console.log(findPkgData("a-package", pkgJson)); 
   </script>
 </body>
 </html>

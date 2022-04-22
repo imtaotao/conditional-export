@@ -2,15 +2,16 @@ import { findPkgData } from "../index";
 
 // https://github.com/jkrems/proposal-pkg-exports#1-exports-field
 describe("findPkgData", () => {
-  it("pkg data(1)", () => {
+  it("pkg data", () => {
     const exports = {
       "./": "./src/util/",
       "./timezones/": "./data/timezones/",
       "./timezones/utc": "./data/timezones/utc/index.mjs",
       "./core-polyfill": ["std:core-module", "./core-polyfill.js"],
     };
-    const data = findPkgData("@momentjs/moment/timezones/pdt.mjs", { exports });
-    expect(data).toMatchObject({
+    expect(
+      findPkgData("@momentjs/moment/timezones/pdt.mjs", { exports })
+    ).toMatchObject({
       name: "@momentjs/moment",
       version: "",
       path: "./data/timezones/pdt.mjs",

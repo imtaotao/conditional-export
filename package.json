@@ -1,6 +1,6 @@
 {
   "name": "node-package-exports",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "find node package entry or path in exports",
   "main": "dist/entry.cjs.js",
   "unpkg": "dist/entry.umd.js",
@@ -13,12 +13,12 @@
   },
   "author": "imtaotao",
   "keywords": [
+    "exports",
+    "imports",
     "node",
     "node-package",
     "entry",
     "path",
-    "exports",
-    "imports",
     "require"
   ],
   "license": "MIT",

@@ -6,9 +6,18 @@ export type BaseType =
   | boolean
   | null
   | undefined;
-export type Exports = BaseType | Array<Exports> | { [key: string]: Exports };
+export type PackageJson = {
+  name?: string;
+  main?: string;
+  type?: string;
+  version?: string;
+  exports?: Exports;
+  imports?: Record<string, Exports>;
+  [key: string]: any;
+};
 export type PkgData = ReturnType<typeof findPkgData>;
 export type ModuleIdData = ReturnType<typeof parseModuleId>;
+export type Exports = BaseType | Array<Exports> | { [key: string]: Exports };
 
 const defaultConditions = ["require"];
 
@@ -285,7 +294,7 @@ export const parseModuleId = (moduleId: string) => {
 
 export const findPkgData = (
   moduleId: string,
-  pkgJson: Record<string, any>,
+  pkgJson: PackageJson,
   conditions = defaultConditions
 ) => {
   let path = null;
@@ -296,7 +305,6 @@ export const findPkgData = (
   if (!name) {
     throw new SyntaxError(`"${raw}" is not a valid module id`);
   }
-
   path = virtualPath
     ? findPathInExports(virtualPath, exps, conditions)
     : findEntryInExports(exps, conditions);
@@ -307,7 +315,6 @@ export const findPkgData = (
     // ./a/ => /a/
     resolve = `${name}${version ? `@${version}` : ""}${path.slice(1)}`;
   }
-
   return {
     raw,
     name,
