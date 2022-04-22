@@ -62,7 +62,7 @@ When you don't know if path exists, you can wrap it like this.
 Because `findPath` does not conditionally match the first-level structure, but `findEntry` will.
 
 ```js
-const find = (path, exps, conditions) => {
+const find = (exps, conditions, path) => {
   return path
     ? findPath(path, exps, conditions)
     : findEntry(exps, conditions);

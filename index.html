@@ -7,20 +7,9 @@
 </head>
 <body>
   <script src="./dist/entry.umd.js"></script>
-  <script>const { findPath, findEntry } = NodePackageExports;</script>
+  <script>const { parseModuleId, findPath, findEntry } = NodePackageExports;</script>
   <script>
-    const exps = {
-      './a': {
-        node: {
-          import: './feature-node.mjs',
-          require: './feature-node.cjs',
-        },
-        default: './feature.default.mjs',
-      }
-    };
-
-    console.log(findPath('./a', exps)); // './feature.default.mjs'
-    console.log(findPath('./a', exps, ['node', 'require'])); // './feature-node.cjs'
+    console.log(parseModuleId("@vue/core/v1.0.0"));
   </script>
 </body>
 </html>

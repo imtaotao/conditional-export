@@ -49,13 +49,13 @@ const detailValue = (
   return null;
 };
 
-// 模糊匹配
 const fuzzyMatch = (path: string, keys: Array<string>) => {
   const findNextKeyIdx = (key: string, idx: number) => {
     for (let i = idx; i < key.length; i++) {
       if (key[i] !== "*") return i;
     }
   };
+
   const findPathMatchIdx = (char: string | undefined, idx: number) => {
     if (!char) return pathLen;
     for (let i = idx; i < pathLen; i++) {
@@ -90,7 +90,6 @@ const fuzzyMatch = (path: string, keys: Array<string>) => {
         break;
       }
     }
-
     if (j < key.length) {
       data.length = 0;
     } else if (i < pathLen) {
@@ -137,7 +136,6 @@ export const findPath = (
       result = detailValue(exps[key], conditions, data);
     }
   }
-
   if (result) {
     // If is dir match, the return must be dir
     const keyIsDir = matchKey!.endsWith("/");
@@ -166,4 +164,98 @@ export const findEntry = (exps: Exports, conditions = defaultConditions) => {
     // If syntactic sugar doesn't exist, try conditional match
     return findPath(".", exps, conditions) || detailValue(exps, conditions);
   }
+};
+
+export const parseModuleId = (moduleId: string) => {
+  let buf = "";
+  let slash = 0;
+  let isScope = false;
+
+  let name = "";
+  let path = "";
+  let version = "";
+
+  const set = (type: string) => {
+    if (type === "path") path = buf;
+    if (type === "name") name = buf;
+    if (type === "version") version = buf;
+    buf = "";
+  };
+
+  const setValueBySlash = (char: string) => {
+    if (!name) {
+      set("name");
+    } else if (!version) {
+      set("version");
+    } else {
+      buf += char;
+    }
+  };
+
+  for (let i = 0, l = moduleId.length; i < l; i++) {
+    const char = moduleId[i];
+    if (char === "@") {
+      if (i === 0) {
+        buf += char;
+        isScope = true;
+      } else if (!name) {
+        if (isScope) {
+          if (slash === 1 && buf[buf.length - 1] !== "/") {
+            set("name");
+          } else {
+            buf += char;
+          }
+        } else {
+          set("name");
+        }
+      } else {
+        buf += char;
+      }
+    } else if (char === "/") {
+      if (slash === 0) {
+        if (!isScope) {
+          setValueBySlash(char);
+        }
+        buf += char;
+      } else if (slash === 1) {
+        if (isScope) {
+          setValueBySlash(char);
+        }
+        buf += char;
+      } else {
+        buf += char;
+      }
+      slash++;
+    } else {
+      buf += char;
+    }
+  }
+
+  if (!name) {
+    set("name");
+  } else if (!version) {
+    moduleId[name.length] === "@" ? set("version") : set("path");
+  } else if (!path) {
+    set("path");
+  }
+
+  if (path) {
+    path = `.${path}`;
+  }
+
+  // @vue -> ''
+  // @vue/ -> ''
+  // @vue// -> ''
+  if (isScope && (slash === 0 || name[name.length - 1] === "/")) {
+    name = "";
+    path = "";
+    version = "";
+  }
+
+  return {
+    name,
+    path,
+    version,
+    raw: moduleId,
+  };
 };
