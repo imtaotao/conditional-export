@@ -72,15 +72,13 @@ findPathInExports('./a', exports, ['node', 'require']); // './feature-node.cjs'
 ```js
 import { findPkgData } from 'node-package-exports';
 
-const pkgJson = {
-  exports: {
-    './': './src/util/',
-    './timezones/': './data/timezones/',
-    './timezones/utc': './data/timezones/utc/index.mjs',
-  }
-};
+const exports = {
+  './': './src/util/',
+  './timezones/': './data/timezones/',
+  './timezones/utc': './data/timezones/utc/index.mjs',
+}
 
-const data = findPkgData('@vue/core/timezones/pdt.mjs', pkgJson);
+const data = findPkgData('@vue/core/timezones/pdt.mjs', exports);
 // {
 //   name: '@vue/core',
 //   version: '',
@@ -129,7 +127,7 @@ When you want to convert to absolute path, you can handle it like this.
 ```js
 import { findPkgData } from 'node-package-exports';
 
-const data = findPkgData('vue/src/index.js', { ... }, ['require', ...]);
+const data = findPkgData('vue/src/index.js', exports, ['require', ...]);
 
 if (data.path !== null) {
   const resolvePath = isNodeEnv

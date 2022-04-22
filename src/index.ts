@@ -6,18 +6,10 @@ export type BaseType =
   | boolean
   | null
   | undefined;
-export type PackageJson = {
-  name?: string;
-  main?: string;
-  type?: string;
-  version?: string;
-  exports?: Exports;
-  imports?: Record<string, Exports>;
-  [key: string]: any;
-};
+export type Imports = Record<string, Exports>;
+export type Exports = BaseType | Array<Exports> | { [key: string]: Exports };
 export type PkgData = ReturnType<typeof findPkgData>;
 export type ModuleIdData = ReturnType<typeof parseModuleId>;
-export type Exports = BaseType | Array<Exports> | { [key: string]: Exports };
 
 const defaultConditions = ["require"];
 
@@ -158,12 +150,14 @@ export const findPathInExports = (
     matchPrefix = path;
     result = conditionMatch(exps[path], conditions);
   } else {
-    // When looking for path, we must match, no conditional match is required
-    const [key, prefix, data] = fuzzyMatchKey(path, Object.keys(exps));
-    if (key) {
-      matchKey = key;
-      matchPrefix = prefix;
-      result = conditionMatch(exps[key], conditions, data);
+    if (path.length > 1) {
+      // When looking for path, we must match, no conditional match is required
+      const [key, prefix, data] = fuzzyMatchKey(path, Object.keys(exps));
+      if (key) {
+        matchKey = key;
+        matchPrefix = prefix;
+        result = conditionMatch(exps[key], conditions, data);
+      }
     }
   }
   if (result) {
@@ -294,24 +288,19 @@ export const parseModuleId = (moduleId: string) => {
 
 export const findPkgData = (
   moduleId: string,
-  pkgJson: PackageJson,
+  exps: Exports,
   conditions = defaultConditions
 ) => {
   let path = null;
   let resolve = null;
-  const exps = pkgJson.exports;
   const { raw, name, version, path: virtualPath } = parseModuleId(moduleId);
 
   if (!name) {
     throw new SyntaxError(`"${raw}" is not a valid module id`);
   }
-  if (pkgJson.name && pkgJson.name !== name) {
-    throw new Error(`"${raw}" does not match "${pkgJson.name}"`);
-  }
   path = virtualPath
     ? findPathInExports(virtualPath, exps, conditions)
     : findEntryInExports(exps, conditions);
-  
   // ./ => /
   // ./a => /a
   // ./a/ => /a/

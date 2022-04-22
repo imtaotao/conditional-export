@@ -197,6 +197,36 @@ describe("findPathInExports", () => {
     );
   });
 
+  it("match order(1)", () => {
+    const exports = {
+      "./*": {
+        require: "./*.js",
+        node: "./*.node.js",
+      },
+    };
+    expect(findPathInExports("./a", exports, ["require", "node"])).toBe(
+      "./a.js"
+    );
+    expect(findPathInExports("./a", exports, ["node", "require"])).toBe(
+      "./a.js"
+    );
+  });
+
+  it("match order(2)", () => {
+    const exports = {
+      "./*": {
+        node: "./*.node.js",
+        require: "./*.js",
+      },
+    };
+    expect(findPathInExports("./a", exports, ["require", "node"])).toBe(
+      "./a.node.js"
+    );
+    expect(findPathInExports("./a", exports, ["node", "require"])).toBe(
+      "./a.node.js"
+    );
+  });
+
   it("deep nested", () => {
     const exports = {
       "./a": {

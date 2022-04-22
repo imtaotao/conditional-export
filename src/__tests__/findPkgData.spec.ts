@@ -10,7 +10,7 @@ describe("findPkgData", () => {
       "./core-polyfill": ["std:core-module", "./core-polyfill.js"],
     };
     expect(
-      findPkgData("@momentjs/moment/timezones/pdt.mjs", { exports })
+      findPkgData("@momentjs/moment/timezones/pdt.mjs", exports)
     ).toMatchObject({
       name: "@momentjs/moment",
       version: "",

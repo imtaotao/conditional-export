@@ -9,14 +9,11 @@
   <script src="./dist/entry.umd.js"></script>
   <script>const { parseModuleId, findPkgData, findEntryInExports, findPathInExports } = NodePackageExports;</script>
   <script>
-     const pkgJson = {
-      name: "a-package",
-      exports: {
-        ".": "./main.mjs",
-        "./foo": "./foo.js",
-      },
-    };
-   console.log(findPkgData("a-package", pkgJson)); 
+    const exports = {
+      ".": "./main.mjs",
+      "./foo": "./foo.js",
+    }
+    console.log(findPkgData("a-package", exports)); 
   </script>
 </body>
 </html>
