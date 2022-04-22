@@ -22,11 +22,6 @@ const exports = {
     development: './index.development.js',
     default: './index.js',
   },
-  './lib/*': {
-    require: './src/*.cjs',
-    development: './src/*.development.js',
-    default: './src/*.js',
-  },
 }
 
 findEntry(exports); // ./index.cjs
@@ -164,4 +159,4 @@ const resolveUrl = new URL(data.path, pkgDir).href;
 
 ## TODO
 
-1. [Support imports Field](https://github.com/jkrems/proposal-pkg-exports#3-imports-field)
+[Support imports Field](https://github.com/jkrems/proposal-pkg-exports#3-imports-field)
