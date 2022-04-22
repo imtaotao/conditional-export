@@ -98,7 +98,7 @@ describe("findPathInExports", () => {
   it("nested condition export", () => {
     const exports = {
       "./a": {
-        node: {
+        development: {
           import: "./feature-node.mjs",
           require: "./feature-node.cjs",
         },
@@ -106,7 +106,7 @@ describe("findPathInExports", () => {
       },
     };
     expect(findPathInExports("./a", exports)).toBe("./feature.mjs");
-    expect(findPathInExports("./a", exports, ["node", "require"])).toBe(
+    expect(findPathInExports("./a", exports, ["development", "require"])).toBe(
       "./feature-node.cjs"
     );
   });
@@ -201,13 +201,13 @@ describe("findPathInExports", () => {
     const exports = {
       "./*": {
         require: "./*.js",
-        node: "./*.node.js",
+        development: "./*.node.js",
       },
     };
-    expect(findPathInExports("./a", exports, ["require", "node"])).toBe(
+    expect(findPathInExports("./a", exports, ["require", "development"])).toBe(
       "./a.js"
     );
-    expect(findPathInExports("./a", exports, ["node", "require"])).toBe(
+    expect(findPathInExports("./a", exports, ["development", "require"])).toBe(
       "./a.js"
     );
   });
@@ -215,28 +215,38 @@ describe("findPathInExports", () => {
   it("match order(2)", () => {
     const exports = {
       "./*": {
-        node: "./*.node.js",
+        development: "./*.node.js",
         require: "./*.js",
       },
     };
-    expect(findPathInExports("./a", exports, ["require", "node"])).toBe(
+    expect(findPathInExports("./a", exports, ["require", "development"])).toBe(
       "./a.node.js"
     );
-    expect(findPathInExports("./a", exports, ["node", "require"])).toBe(
+    expect(findPathInExports("./a", exports, ["development", "require"])).toBe(
       "./a.node.js"
     );
+  });
+
+  it("check cycle key", () => {
+    const exports = {
+      "./a": {
+        require: "./b",
+      },
+      "./b": "./b.js",
+    };
+    expect(findPathInExports("./a", exports)).toBe("./b");
   });
 
   it("deep nested", () => {
     const exports = {
       "./a": {
-        node: {
+        development: {
           require: {
-            node: [
+            development: [
               {
-                node: {
+                development: {
                   require: {
-                    node: {
+                    development: {
                       require: [{}, "./b.js"],
                     },
                   },
@@ -247,7 +257,7 @@ describe("findPathInExports", () => {
         },
       },
     };
-    expect(findPathInExports("./a", exports, ["node", "require"])).toBe(
+    expect(findPathInExports("./a", exports, ["development", "require"])).toBe(
       "./b.js"
     );
   });
@@ -255,13 +265,13 @@ describe("findPathInExports", () => {
   it("deep nested match", () => {
     const exports = {
       "./a/*": {
-        node: {
+        development: {
           require: {
-            node: [
+            development: [
               {
-                node: {
+                development: {
                   require: {
-                    node: {
+                    development: {
                       require: [{}, "./src/*.js"],
                     },
                   },
@@ -272,21 +282,21 @@ describe("findPathInExports", () => {
         },
       },
     };
-    expect(findPathInExports("./a/index", exports, ["node", "require"])).toBe(
-      "./src/index.js"
-    );
+    expect(
+      findPathInExports("./a/index", exports, ["development", "require"])
+    ).toBe("./src/index.js");
   });
 
   it("deep nested match", () => {
     const exports = {
       "./a": {
-        node: {
+        development: {
           require: {
-            node: [
+            development: [
               {
-                node: {
+                development: {
                   require: {
-                    node: {
+                    development: {
                       require: [{}, "b.js"],
                     },
                   },
@@ -297,6 +307,8 @@ describe("findPathInExports", () => {
         },
       },
     };
-    expect(findPathInExports("./a", exports, ["node", "require"])).toBe(null);
+    expect(findPathInExports("./a", exports, ["development", "require"])).toBe(
+      null
+    );
   });
 });

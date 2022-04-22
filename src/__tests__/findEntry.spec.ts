@@ -2,7 +2,7 @@ import { findEntryInExports } from "../index";
 
 describe("findEntryInExports", () => {
   it("string export", () => {
-    expect(findEntryInExports("")).toBe("");
+    expect(findEntryInExports("")).toBe(null);
     expect(findEntryInExports("./a.js")).toBe("./a.js");
     expect(findEntryInExports(0)).toBe(null);
     expect(findEntryInExports(1)).toBe(null);
@@ -16,22 +16,29 @@ describe("findEntryInExports", () => {
   it("array export", () => {
     expect(findEntryInExports(["./a.js"])).toBe("./a.js");
     expect(findEntryInExports(["a.js", "./b.js"])).toBe("./b.js");
-    expect(findEntryInExports([{ node: "./a.js" }, "./b.js"])).toBe("./b.js");
-    expect(findEntryInExports([{ node: "./a.js" }, "./b.js"], ["node"])).toBe(
-      "./a.js"
-    );
-    expect(findEntryInExports([{ node: "./a.js" }, "b.js"])).toBe(null);
-    expect(findEntryInExports([{ node: "a.js" }, "./b.js"], ["node"])).toBe(
+    expect(findEntryInExports([{ development: "./a.js" }, "./b.js"])).toBe(
       "./b.js"
     );
-    expect(findEntryInExports([{ node: "a.js" }, "b.js"], ["node"])).toBe(null);
     expect(
-      findEntryInExports([{ node: { require: "./a.js" } }, "./b.js"], ["node"])
+      findEntryInExports([{ development: "./a.js" }, "./b.js"], ["development"])
+    ).toBe("./a.js");
+    expect(findEntryInExports([{ development: "./a.js" }, "b.js"])).toBe(null);
+    expect(
+      findEntryInExports([{ development: "a.js" }, "./b.js"], ["development"])
+    ).toBe("./b.js");
+    expect(
+      findEntryInExports([{ development: "a.js" }, "b.js"], ["development"])
+    ).toBe(null);
+    expect(
+      findEntryInExports(
+        [{ development: { require: "./a.js" } }, "./b.js"],
+        ["development"]
+      )
     ).toBe("./b.js");
     expect(
       findEntryInExports(
-        [{ node: { require: "./a.js" } }, "./b.js"],
-        ["node", "require"]
+        [{ development: { require: "./a.js" } }, "./b.js"],
+        ["development", "require"]
       )
     ).toBe("./a.js");
   });

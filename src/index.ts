@@ -13,7 +13,7 @@ export type ModuleIdData = ReturnType<typeof parseModuleId>;
 
 const defaultConditions = ["require"];
 
-const isNativeType = (value: any): value is BaseType => {
+const isNativeType = (value: unknown): value is BaseType => {
   const type = typeof value;
   return (
     type === "number" ||
@@ -26,23 +26,31 @@ const isNativeType = (value: any): value is BaseType => {
   );
 };
 
-const valid = (value: null | string) => {
-  if (typeof value !== "string") return null;
-  if (!value.startsWith("./")) return null;
-  return value;
+const normalize = (path: string) => {
+  return path;
 };
 
-// https://github.com/jkrems/proposal-pkg-exports
+const valid = (path: null | string, isExps: boolean) => {
+  if (typeof path !== "string") return null;
+  path = normalize(path);
+  if (!path.startsWith("./")) return null;
+  if (isExps && path.includes("node_modules")) {
+    return null;
+  }
+  return path;
+};
+
 const conditionMatch = (
   exps: Exports,
   conditions: Array<string>,
+  isExps: boolean,
   data?: Array<string>
 ): null | string => {
   if (exps === null) {
     return null;
   } else if (typeof exps === "string") {
     if (!data || !data.length) {
-      return valid(exps);
+      return valid(exps, isExps);
     }
     let result = "";
     const parts = exps.split(/\*+/);
@@ -52,10 +60,10 @@ const conditionMatch = (
         result += data[i] || "";
       }
     }
-    return valid(result);
+    return valid(result, isExps);
   } else if (Array.isArray(exps)) {
     for (const val of exps) {
-      const result = conditionMatch(val, conditions, data);
+      const result = conditionMatch(val, conditions, isExps, data);
       if (result) return result;
     }
     return null;
@@ -64,7 +72,7 @@ const conditionMatch = (
     const keys = Object.keys(exps);
     for (const key of keys) {
       if (key === "default" || conditions.includes(key)) {
-        result = conditionMatch(exps[key], conditions, data);
+        result = conditionMatch(exps[key], conditions, isExps, data);
         if (result) return result;
       }
     }
@@ -73,6 +81,11 @@ const conditionMatch = (
 };
 
 const fuzzyMatchKey = (path: string, keys: Array<string>) => {
+  let prefix;
+  let matched;
+  const data = [];
+  const pathLen = path.length;
+
   const findNextKeyIdx = (key: string, idx: number) => {
     for (let i = idx; i < key.length; i++) {
       if (key[i] !== "*") return i;
@@ -87,18 +100,12 @@ const fuzzyMatchKey = (path: string, keys: Array<string>) => {
     return -1;
   };
 
-  let prefix;
-  let matched;
-  const data = [];
-  const pathLen = path.length;
-
   keys = keys.sort((a, b) => b.length - a.length);
 
   for (const key of keys) {
     if (matched) break;
     let i = 0;
     let j = 0;
-
     for (i = 0; i < pathLen; i++) {
       if (path[i] === key[j]) {
         j++;
@@ -113,6 +120,7 @@ const fuzzyMatchKey = (path: string, keys: Array<string>) => {
         break;
       }
     }
+
     if (j < key.length) {
       data.length = 0;
     } else if (i < pathLen) {
@@ -148,7 +156,7 @@ export const findPathInExports = (
   if (exps[path]) {
     matchKey = path;
     matchPrefix = path;
-    result = conditionMatch(exps[path], conditions);
+    result = conditionMatch(exps[path], conditions, true);
   } else {
     if (path.length > 1) {
       // When looking for path, we must match, no conditional match is required
@@ -156,7 +164,7 @@ export const findPathInExports = (
       if (key) {
         matchKey = key;
         matchPrefix = prefix;
-        result = conditionMatch(exps[key], conditions, data);
+        result = conditionMatch(exps[key], conditions, true, data);
       }
     }
   }
@@ -178,18 +186,45 @@ export const findEntryInExports = (
   conditions = defaultConditions
 ) => {
   if (typeof exps === "string") {
-    return exps;
-  } else if (isNativeType(exps)) {
-    return null;
-  } else if (Array.isArray(exps)) {
-    return conditionMatch(exps, conditions);
+    return valid(exps, true);
   } else {
     // If syntactic sugar doesn't exist, try conditional match
     return (
       findPathInExports(".", exps, conditions) ||
-      conditionMatch(exps, conditions)
+      conditionMatch(exps, conditions, true)
     );
   }
+};
+
+export const findPkgData = (
+  moduleId: string,
+  exps: Exports,
+  conditions = defaultConditions
+) => {
+  let path = null;
+  let resolve = null;
+  const { raw, name, version, path: virtualPath } = parseModuleId(moduleId);
+
+  if (!name) {
+    throw new SyntaxError(`"${raw}" is not a valid module id`);
+  }
+  path = virtualPath
+    ? findPathInExports(virtualPath, exps, conditions)
+    : findEntryInExports(exps, conditions);
+  // ./ => /
+  // ./a => /a
+  // ./a/ => /a/
+  if (path) {
+    resolve = `${name}${version ? `@${version}` : ""}${path.slice(1)}`;
+  }
+
+  return {
+    raw,
+    name,
+    path,
+    version,
+    resolve,
+  };
 };
 
 export const parseModuleId = (moduleId: string) => {
@@ -283,36 +318,5 @@ export const parseModuleId = (moduleId: string) => {
     path,
     version,
     raw: moduleId,
-  };
-};
-
-export const findPkgData = (
-  moduleId: string,
-  exps: Exports,
-  conditions = defaultConditions
-) => {
-  let path = null;
-  let resolve = null;
-  const { raw, name, version, path: virtualPath } = parseModuleId(moduleId);
-
-  if (!name) {
-    throw new SyntaxError(`"${raw}" is not a valid module id`);
-  }
-  path = virtualPath
-    ? findPathInExports(virtualPath, exps, conditions)
-    : findEntryInExports(exps, conditions);
-  // ./ => /
-  // ./a => /a
-  // ./a/ => /a/
-  if (path) {
-    resolve = `${name}${version ? `@${version}` : ""}${path.slice(1)}`;
-  }
-
-  return {
-    raw,
-    name,
-    path,
-    version,
-    resolve,
   };
 };
