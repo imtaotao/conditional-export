@@ -305,6 +305,9 @@ export const findPkgData = (
   if (!name) {
     throw new SyntaxError(`"${raw}" is not a valid module id`);
   }
+  if (pkgJson.name && pkgJson.name !== name) {
+    throw new Error(`"${raw}" does not match "${pkgJson.name}"`);
+  }
   path = virtualPath
     ? findPathInExports(virtualPath, exps, conditions)
     : findEntryInExports(exps, conditions);
@@ -315,6 +318,7 @@ export const findPkgData = (
     // ./a/ => /a/
     resolve = `${name}${version ? `@${version}` : ""}${path.slice(1)}`;
   }
+
   return {
     raw,
     name,
