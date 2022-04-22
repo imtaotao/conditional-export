@@ -284,13 +284,13 @@ export const findPkgData = (
 ) => {
   let path = null;
   let resolve = null;
-  let { raw, name, version, path: realPath } = parseModuleId(moduleId);
+  let { raw, name, version, path: virtualPath } = parseModuleId(moduleId);
   if (!name) {
     throw new SyntaxError(`"${raw}" is not a valid module id`);
   }
 
-  path = realPath
-    ? findPath(realPath, exps, conditions)
+  path = virtualPath
+    ? findPath(virtualPath, exps, conditions)
     : findEntry(exps, conditions);
 
   if (path) {
