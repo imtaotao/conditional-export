@@ -16,12 +16,11 @@ const createNodeTestEnv = (
   dest: string | null
 ) => {
   const name = "demo" + ++id;
-  const nodeModules = path.resolve(__dirname, "./node_modules");
-  const dir = path.resolve(nodeModules, name);
+  const dir = path.resolve(__dirname, "./node_modules", name);
   const jsonDir = path.resolve(dir, "./package.json");
 
-  if (fs.existsSync(nodeModules)) {
-    fs.removeSync(nodeModules);
+  if (fs.existsSync(dir)) {
+    fs.removeSync(dir);
   }
   fs.ensureFileSync(jsonDir);
   fs.writeFileSync(jsonDir, JSON.stringify({ name, [type]: obj }, null, 2));
@@ -32,7 +31,7 @@ const createNodeTestEnv = (
   return {
     dir,
     name,
-    remove: () => fs.removeSync(nodeModules),
+    remove: () => fs.removeSync(dir),
   };
 };
 
