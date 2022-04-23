@@ -5,12 +5,21 @@
 
 </div>
 
-Find entry or path in package.json exports. https://github.com/jkrems/proposal-pkg-exports
+Find entry or path in package.json exports. https://nodejs.org/docs/latest-v12.x/api/packages.html#packages_exports
+
+
+
+### API
+
+- [`findEntryInExports`](#findentryinexports)
+- [`findPathInExports`](#findpathinexports)
+- [`findPathInImports `](#findpathinimports)
+- [`findPkgData`](#findpkgdata)
+- [`parseModuleId`](#parsemoduleid)
+
 
 
 ### findEntryInExports
-
-Default conditions is `['require']`;
 
 ```js
 import { findEntryInExports } from 'node-package-exports';
@@ -47,9 +56,9 @@ findPathInExports('./lib/index', exports, ['development']); // ./src/index.devel
 findPathInExports('./lib/index', exports, ['production']); // ./src/index.js
 ```
 
-Multiple conditions.
+Multiple conditions, default conditions is `['require']`.
 
-> this is an extension function
+> You can specify multiple conditions.
 
 ```js
 import { findPathInExports } from 'node-package-exports';
@@ -69,7 +78,7 @@ findPathInExports('./a', exports, ['node', 'require']); // './feature-node.cjs'
 ```
 
 
-### findPathInExports
+### findPathInImports
 
 ```js
 import { findPathInImports } from 'node-package-exports';
