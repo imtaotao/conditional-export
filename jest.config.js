@@ -9,4 +9,5 @@ module.exports = {
   coverageProvider: 'v8',
   coverageDirectory: 'coverage',
   transform: { '\\.ts$': 'ts-jest' },
+  resolver: '<rootDir>/resolver.js'
 };
