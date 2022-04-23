@@ -80,6 +80,8 @@ const conditionMatch = (
   return null;
 };
 
+// Support more complex fuzzy matching rules,
+// backward compatible with the definition of the specification
 const fuzzyMatchKey = (path: string, keys: Array<string>) => {
   let prefix;
   let matched;

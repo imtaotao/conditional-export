@@ -18,7 +18,7 @@ const createNodeTestEnv = (
   const name = "demo" + ++id;
   const dir = path.resolve(__dirname, "./node_modules", name);
   const jsonDir = path.resolve(dir, "./package.json");
-  
+
   if (fs.existsSync(dir)) fs.removeSync(dir);
   fs.ensureFileSync(jsonDir);
   fs.writeFileSync(jsonDir, JSON.stringify({ name, [type]: obj }, null, 2));
@@ -40,10 +40,11 @@ const resolvePath = (input: string, name: string) => {
 export const checkFindPath = (
   input: string,
   exps: Exports,
-  value: string | null
+  value: string | null,
+  conditions?: Array<string>
 ) => {
   // check customize behavior
-  expect(findPathInExports(input, exps)).toBe(value);
+  expect(findPathInExports(input, exps, conditions)).toBe(value);
   // check node behavior
   const { dir, name, remove } = createNodeTestEnv("exports", exps, value);
   if (value === null) {
@@ -54,4 +55,18 @@ export const checkFindPath = (
   remove();
 };
 
-export const checkFindEntry = (exps: Exports, value: string | null) => {};
+export const checkFindEntry = (
+  exps: Exports,
+  value: string | null,
+  conditions?: Array<string>
+) => {
+  // check customize behavior
+  expect(findEntryInExports(exps, conditions)).toBe(value);
+  const { dir, name, remove } = createNodeTestEnv("exports", exps, value);
+  if (value === null) {
+    expect(() => resolvePath(".", name)).toThrow();
+  } else {
+    expect(resolvePath(".", name)).toBe(path.resolve(dir, value));
+  }
+  remove();
+};
