@@ -43,9 +43,7 @@ export const checkFindPath = (
   value: string | null,
   conditions?: Array<string>
 ) => {
-  // check customize behavior
-  expect(findPathInExports(input, exps, conditions)).toBe(value);
-  // check node behavior
+  // check nodeJs behavior
   const { dir, name, remove } = createNodeTestEnv("exports", exps, value);
   if (value === null) {
     expect(() => resolvePath(input, name)).toThrow();
@@ -53,6 +51,8 @@ export const checkFindPath = (
     expect(resolvePath(input, name)).toBe(path.resolve(dir, value));
   }
   remove();
+  // check customize behavior
+  expect(findPathInExports(input, exps, conditions)).toBe(value);
 };
 
 export const checkFindEntry = (
@@ -60,8 +60,7 @@ export const checkFindEntry = (
   value: string | null,
   conditions?: Array<string>
 ) => {
-  // check customize behavior
-  expect(findEntryInExports(exps, conditions)).toBe(value);
+  // check nodeJs behavior
   const { dir, name, remove } = createNodeTestEnv("exports", exps, value);
   if (value === null) {
     expect(() => resolvePath(".", name)).toThrow();
@@ -69,4 +68,6 @@ export const checkFindEntry = (
     expect(resolvePath(".", name)).toBe(path.resolve(dir, value));
   }
   remove();
+  // check customize behavior
+  expect(findEntryInExports(exps, conditions)).toBe(value);
 };

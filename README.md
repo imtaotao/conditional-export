@@ -148,7 +148,13 @@ if (data.path !== null) {
 <body>
   <script src='https://unpkg.com/node-package-exports/dist/entry.umd.js'></script>
   <script>
-    const { findPkgData, findPathInExports, findEntryInExports, parseModuleId } = NodePackageExports;
+    const {
+      findPkgData,
+      findPathInExports,
+      findEntryInExports,
+      parseModuleId,
+    } = NodePackageExports;
+    
     // ...
   </script>
 </body>

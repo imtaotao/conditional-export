@@ -145,6 +145,11 @@ describe("findPathInExports", () => {
   it("multiple * matches", () => {
     expect(
       findPathInExports("./lib/taox/index", {
+        "./lib/*x*x": { require: "./src/*a*.cjs" },
+      })
+    ).toBe("./src/taoa/inde.cjs");
+    expect(
+      findPathInExports("./lib/taox/index", {
         "./lib/*x/*": { require: "./src/*.cjs*" },
       })
     ).toBe("./src/tao.cjsindex");
@@ -243,6 +248,33 @@ describe("findPathInExports", () => {
       "./b": "./b.js",
     };
     checkFindPath("./a", exports, "./b");
+  });
+
+  it("check node_modules", () => {
+    checkFindPath(
+      "./a",
+      {
+        "./a": "./src/node_modules1/a.js",
+      },
+      "./src/node_modules1/a.js"
+    );
+    checkFindPath(
+      "./a",
+      {
+        "./a": "./src/node_modules/a.js",
+      },
+      null
+    );
+  });
+
+  it("check backtrack", () => {
+    checkFindPath(
+      "./a",
+      {
+        "./a": "./../a.js",
+      },
+      null
+    );
   });
 
   it("deep nested", () => {

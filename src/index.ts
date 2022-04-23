@@ -34,7 +34,7 @@ const valid = (path: null | string, isExps: boolean) => {
   if (typeof path !== "string") return null;
   path = normalize(path);
   if (!path.startsWith("./")) return null;
-  if (isExps && path.includes("node_modules")) {
+  if (isExps && path.includes("/node_modules/")) {
     return null;
   }
   return path;
