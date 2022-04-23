@@ -275,6 +275,13 @@ describe("findPathInExports", () => {
       },
       null
     );
+    checkFindPath(
+      "./a",
+      {
+        "./a": "./b/../a.js",
+      },
+      null
+    );
   });
 
   it("deep nested", () => {

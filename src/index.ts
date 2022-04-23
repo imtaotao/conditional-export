@@ -26,20 +26,6 @@ const isNativeType = (value: unknown): value is BaseType => {
   );
 };
 
-const normalize = (path: string) => {
-  return path;
-};
-
-const valid = (path: null | string, isExps: boolean) => {
-  if (typeof path !== "string") return null;
-  path = normalize(path);
-  if (!path.startsWith("./")) return null;
-  if (isExps && path.includes("/node_modules/")) {
-    return null;
-  }
-  return path;
-};
-
 const conditionMatch = (
   exps: Exports,
   conditions: Array<string>,
@@ -138,6 +124,16 @@ const fuzzyMatchKey = (path: string, keys: Array<string>) => {
     }
   }
   return [matched, prefix, data] as const;
+};
+
+export const valid = (path: null | string, isExps: boolean) => {
+  if (typeof path !== "string") return null;
+  if (!path.startsWith("./")) return null;
+  if (path.includes("../")) return null;
+  if (isExps && path.includes("/node_modules/")) {
+    return null;
+  }
+  return path;
 };
 
 export const findPathInExports = (
