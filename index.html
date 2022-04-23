@@ -7,13 +7,23 @@
 </head>
 <body>
   <script src="./dist/entry.umd.js"></script>
-  <script>const { parseModuleId, findPkgData, findEntryInExports, findPathInExports } = NodePackageExports;</script>
   <script>
-    const exports = {
-      ".": "./main.mjs",
-      "./foo": "./foo.js",
+    const {
+      parseModuleId,
+      findPkgData,
+      findPathInImports,
+      findPathInExports,
+      findEntryInExports,
+    } = NodePackageExports;
+  </script>
+  <script>
+    const imports = {
+      "#timezones/": "./data/timezones/",
+      "#timezones/utc": "./data/timezones/utc/index.mjs",
+      "#external-feature": "external-pkg/feature",
+      "#moment/": "./"
     }
-    console.log(findPkgData("a-package", exports)); 
+    console.log(findPathInImports("#external-feature", imports)); 
   </script>
 </body>
 </html>

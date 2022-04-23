@@ -26,6 +26,19 @@ const isNativeType = (value: unknown): value is BaseType => {
   );
 };
 
+const valid = (path: null | string, isExps: boolean) => {
+  if (typeof path !== "string") {
+    return null;
+  } else if (path.includes("../")) {
+    return null;
+  } else if (path.includes("/node_modules/")) {
+    return null;
+  } else if (!path.startsWith("./")) {
+    if (isExps) return null;
+  }
+  return path;
+};
+
 const conditionMatch = (
   exps: Exports,
   conditions: Array<string>,
@@ -126,43 +139,28 @@ const fuzzyMatchKey = (path: string, keys: Array<string>) => {
   return [matched, prefix, data] as const;
 };
 
-export const valid = (path: null | string, isExps: boolean) => {
-  if (typeof path !== "string") return null;
-  if (!path.startsWith("./")) return null;
-  if (path.includes("../")) return null;
-  if (isExps && path.includes("/node_modules/")) {
-    return null;
-  }
-  return path;
-};
-
-export const findPathInExports = (
+const findPath = (
   path: string,
-  exps: Exports,
-  conditions = defaultConditions
+  obj: Imports,
+  conditions: Array<string>,
+  isExps: boolean
 ) => {
-  if (isNativeType(exps)) return null;
-  if (Array.isArray(exps)) return null;
-  if (path !== "." && !path.startsWith("./")) {
-    throw new TypeError("path must be `.` or start with `./`");
-  }
-
   let result = null;
   let matchKey = null;
   let matchPrefix = null;
 
-  if (exps[path]) {
+  if (obj[path]) {
     matchKey = path;
     matchPrefix = path;
-    result = conditionMatch(exps[path], conditions, true);
+    result = conditionMatch(obj[path], conditions, isExps);
   } else {
     if (path.length > 1) {
       // When looking for path, we must match, no conditional match is required
-      const [key, prefix, data] = fuzzyMatchKey(path, Object.keys(exps));
+      const [key, prefix, data] = fuzzyMatchKey(path, Object.keys(obj));
       if (key) {
         matchKey = key;
         matchPrefix = prefix;
-        result = conditionMatch(exps[key], conditions, true, data);
+        result = conditionMatch(obj[key], conditions, isExps, data);
       }
     }
   }
@@ -177,6 +175,32 @@ export const findPathInExports = (
     }
   }
   return result;
+};
+
+export const findPathInExports = (
+  path: string,
+  exps: Exports,
+  conditions = defaultConditions
+) => {
+  if (isNativeType(exps)) return null;
+  if (Array.isArray(exps)) return null;
+  if (path !== "." && !path.startsWith("./")) {
+    throw new SyntaxError("path must be `.` or start with `./`");
+  }
+  return findPath(path, exps, conditions, true);
+};
+
+export const findPathInImports = (
+  path: string,
+  imports: Imports,
+  conditions = defaultConditions
+) => {
+  if (isNativeType(imports)) return null;
+  if (Array.isArray(imports)) return null;
+  if (!path.startsWith("#")) {
+    throw new SyntaxError("path must start with `#`");
+  }
+  return findPath(path, imports, conditions, false);
 };
 
 export const findEntryInExports = (

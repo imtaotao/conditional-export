@@ -49,6 +49,8 @@ findPathInExports('./lib/index', exports, ['production']); // ./src/index.js
 
 Multiple conditions.
 
+> this is an extension function
+
 ```js
 import { findPathInExports } from 'node-package-exports';
 
@@ -65,6 +67,29 @@ const exports = {
 findPathInExports('./a', exports); // './feature.default.mjs'
 findPathInExports('./a', exports, ['node', 'require']); // './feature-node.cjs'
 ```
+
+
+### findPathInExports
+
+```js
+import { findPathInImports } from 'node-package-exports';
+
+const imports = {
+  "#timezones/": "./data/timezones/",
+  "#timezones/utc": "./data/timezones/utc/index.mjs",
+  "#external-feature": "external-pkg/feature",
+  "#moment/": "./"
+}
+
+findPathInImports("#timezones/utc", imports); // ./data/timezones/utc/index.mjs
+findPathInImports("#external-feature", imports); // external-pkg/feature
+findPathInImports("#timezones/utc/index.mjs", imports); // ./data/timezones/utc/index.mjs
+findPathInImports("#moment/data/timezones/utc/index.mjs", imports); // ./data/timezones/utc/index.mjs
+findPathInImports("#timezones/utc/", imports); // ./data/timezones/utc/
+findPathInImports("#unknown", imports); // null
+findPathInImports("#moment", imports); // null
+```
+
 
 
 ### findPkgData
@@ -150,6 +175,7 @@ if (data.path !== null) {
   <script>
     const {
       findPkgData,
+      findPathInImports,
       findPathInExports,
       findEntryInExports,
       parseModuleId,
@@ -160,8 +186,3 @@ if (data.path !== null) {
 </body>
 </html>
 ```
-
-
-### TODO
-
-[Support imports Field](https://github.com/jkrems/proposal-pkg-exports#3-imports-field)

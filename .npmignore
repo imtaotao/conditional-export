@@ -5,6 +5,7 @@ src/
 .npmignore
 index.html
 jest.config.js
+resolver.js
 rollup.config.js
 tsconfig.json
 yarn.lock
