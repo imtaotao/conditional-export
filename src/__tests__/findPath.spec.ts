@@ -38,49 +38,45 @@ describe("findPathInExports", () => {
   });
 
   it("dir check", () => {
-    checkFindPath(
-      "./lib/",
-      {
+    expect(
+      findPathInExports("./lib/", {
         "./lib/": { require: "./src/" },
-      },
-      "./src/"
-    );
-    checkFindPath(
-      "./lib/",
-      {
+      })
+    ).toBe("./src/");
+
+    expect(
+      findPathInExports("./lib/", {
         "./lib": { require: "./src" },
-      },
-      null
-    );
-    checkFindPath(
-      "./lib/",
-      {
+      })
+    ).toBe(null);
+
+    expect(
+      findPathInExports("./lib/", {
         "./lib": { require: "./src/" },
-      },
-      null
-    );
-    checkFindPath(
-      "./lib/",
-      {
+      })
+    ).toBe(null);
+
+    expect(
+      findPathInExports("./lib/", {
         "./lib/": { require: "./src" },
-      },
-      null
-    );
-    checkFindPath(
-      "./lib/index/",
-      {
+      })
+    ).toBe(null);
+
+    expect(
+      findPathInExports("./lib/index/", {
         "./lib/": { require: "./src/" },
-      },
-      "./src/index/"
-    );
+      })
+    ).toBe("./src/index/");
   });
 
   it("root dir", () => {
     const exports = {
       "./": "./src/utils/",
     };
-    checkFindPath("./tick.js", exports, "./src/utils/tick.js");
-    checkFindPath("./a/tick.js", exports, "./src/utils/a/tick.js");
+    expect(findPathInExports("./tick.js", exports)).toBe("./src/utils/tick.js");
+    expect(findPathInExports("./a/tick.js", exports)).toBe(
+      "./src/utils/a/tick.js"
+    );
   });
 
   it("root match", () => {
