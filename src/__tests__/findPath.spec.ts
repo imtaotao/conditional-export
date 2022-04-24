@@ -172,17 +172,23 @@ describe("findPathInExports", () => {
       findPathInExports("./lib/taox/index", {
         "./lib/**x/*": { require: "./src/**.cjs" },
       })
-    ).toBe("./src/tao.cjs");
+    ).toBe(null);
     expect(
       findPathInExports("./lib/taox/index", {
         "./lib/**x/*": { require: "./src/*.cjs" },
+        "./lib/*x/*": { require: "./src/*.mjs" },
       })
-    ).toBe("./src/tao.cjs");
+    ).toBe("./src/tao.mjs");
     expect(
       findPathInExports("./lib/taox/index", {
         "./lib/*x/*": { require: "./src/**.cjs" },
       })
-    ).toBe("./src/tao.cjs");
+    ).toBe(null);
+    expect(
+      findPathInExports("./lib/taox/index", {
+        "./lib/**x/*": { require: "./src/*.cjs" },
+      })
+    ).toBe(null);
   });
 
   // Some nodejs versions allow fuzzy matching dir, some don't

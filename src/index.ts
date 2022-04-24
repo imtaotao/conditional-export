@@ -51,12 +51,14 @@ const conditionMatch = (
     if (!data || !data.length) {
       return valid(exps, isExps);
     }
+    let j = 0;
     let result = "";
-    const parts = exps.split(/\*+/);
-    for (let i = 0; i < parts.length; i++) {
-      result += parts[i];
-      if (i !== parts.length - 1) {
-        result += data[i] || "";
+    for (let i = 0; i < exps.length; i++) {
+      if (exps[i] === "*") {
+        if (exps[i + 1] === "*") return null;
+        result += data[j++] || "";
+      } else {
+        result += exps[i];
       }
     }
     return valid(result, isExps);
@@ -87,12 +89,6 @@ const fuzzyMatchKey = (path: string, keys: Array<string>) => {
   const data = [];
   const pathLen = path.length;
 
-  const findNextKeyIdx = (key: string, idx: number) => {
-    for (let i = idx; i < key.length; i++) {
-      if (key[i] !== "*") return i;
-    }
-  };
-
   const findPathMatchIdx = (char: string | undefined, idx: number) => {
     if (!char) return pathLen;
     for (let i = idx; i < pathLen; i++) {
@@ -111,12 +107,13 @@ const fuzzyMatchKey = (path: string, keys: Array<string>) => {
       if (path[i] === key[j]) {
         j++;
       } else if (key[j] === "*") {
-        const nextKeyIdx = findNextKeyIdx(key, j + 1);
-        const pathMatchIdx = findPathMatchIdx(key[nextKeyIdx!], i + 1);
+        const next = key[j + 1];
+        if (next === "*") break;
+        const pathMatchIdx = findPathMatchIdx(next, i + 1);
         if (pathMatchIdx === -1) break;
         data.push(path.slice(i, pathMatchIdx));
+        j += 2;
         i = pathMatchIdx;
-        j = nextKeyIdx! + 1;
       } else {
         break;
       }
@@ -253,7 +250,6 @@ export const parseModuleId = (moduleId: string) => {
   let name = "";
   let path = "";
   let version = "";
-
   let buf = "";
   let slash = 0;
   let isScope = false;
