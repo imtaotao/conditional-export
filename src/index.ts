@@ -182,7 +182,7 @@ export const findPathInExports = (
   if (isNativeType(exps)) return null;
   if (Array.isArray(exps)) return null;
   if (path !== "." && !path.startsWith("./")) {
-    throw new SyntaxError("path must be `.` or start with `./`");
+    throw new SyntaxError(`path "${path}" must be "." or start with "./"`);
   }
   return findPath(path, exps, conditions, true);
 };
@@ -195,7 +195,7 @@ export const findPathInImports = (
   if (isNativeType(imports)) return null;
   if (Array.isArray(imports)) return null;
   if (!path.startsWith("#")) {
-    throw new SyntaxError("path must start with `#`");
+    throw new SyntaxError(`path "${path}" must start with "#"`);
   }
   return findPath(path, imports, conditions, false);
 };
