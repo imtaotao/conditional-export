@@ -1,16 +1,12 @@
 <div align='center'>
 <h2>node-package-exports</h2>
 
-[![NPM version](https://img.shields.io/npm/v/node-package-exports.svg?style=flat-square)](https://www.npmjs.com/package/node-package-exports)
+[![NPM version](https://img.shields.io/npm/v/node-package-exports.svg?color=a1b858&label=)](https://www.npmjs.com/package/node-package-exports)
 
 </div>
 
-Find entry or path in package.json exports.
+Find entry or path in package.json exports or imports.
 > https://nodejs.org/docs/latest-v12.x/api/packages.html#packages_exports
-
-
-
-### API
 
 - [`findEntryInExports`](#findentryinexports)
 - [`findPathInExports`](#findpathinexports)
@@ -19,6 +15,9 @@ Find entry or path in package.json exports.
 - [`parseModuleId`](#parsemoduleid)
 
 
+## Usage
+
+Apis usage description.
 
 ### findEntryInExports
 
@@ -155,7 +154,7 @@ parseModuleId('@vue/core@v1.0.0/a.js');
 ```
 
 
-### Extended usage
+## Extended usage
 
 When you want to convert to absolute path, you can handle it like this.
 
@@ -175,7 +174,7 @@ if (data.path !== null) {
 ```
 
 
-### CDN
+## CDN
 
 ```html
 <!DOCTYPE html>
