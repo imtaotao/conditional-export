@@ -17,13 +17,10 @@
     } = NodePackageExports;
   </script>
   <script>
-    const imports = {
-      "#timezones/": "./data/timezones/",
-      "#timezones/utc": "./data/timezones/utc/index.mjs",
-      "#external-feature": "external-pkg/feature",
-      "#moment/": "./"
+    const exports = {
+      "./lib/*/": { require: "./src/*/" },
     }
-    console.log(findPathInImports("#external-feature", imports)); 
+    console.log(findPathInExports("./lib/index/index.js", exports)); 
   </script>
 </body>
 </html>

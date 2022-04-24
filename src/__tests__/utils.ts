@@ -25,12 +25,17 @@ const createNodeTestEnv = (
   fs.ensureFileSync(jsonDir);
   fs.writeFileSync(jsonDir, JSON.stringify({ name, [type]: obj }, null, 2));
   if (dest !== null) {
-    dest = path.resolve(dir, dest);
-    dest.endsWith("/") ? fs.ensureDirSync(dest) : fs.ensureFileSync(dest);
+    if (dest.endsWith("/")) {
+      dest = path.resolve(dir, dest, "./index.js"); // Some nodejs versions automatically look for index.js
+      fs.ensureFileSync(dest);
+    } else {
+      dest = path.resolve(dir, dest);
+      fs.ensureFileSync(dest);
+    }
   }
   return {
-    dir,
     name,
+    dest,
     remove: () => fs.removeSync(dir),
   };
 };
@@ -46,11 +51,11 @@ export const checkFindPath = (
   conditions?: Array<string>
 ) => {
   // check nodeJs behavior
-  const { dir, name, remove } = createNodeTestEnv("exports", exps, value);
+  const { name, dest, remove } = createNodeTestEnv("exports", exps, value);
   if (value === null) {
     expect(() => resolvePath(input, name)).toThrow();
   } else {
-    expect(resolvePath(input, name)).toBe(path.resolve(dir, value));
+    expect(resolvePath(input, name)).toBe(dest);
   }
   remove();
   // check customize behavior
@@ -63,11 +68,11 @@ export const checkFindEntry = (
   conditions?: Array<string>
 ) => {
   // check nodeJs behavior
-  const { dir, name, remove } = createNodeTestEnv("exports", exps, value);
+  const { name, dest, remove } = createNodeTestEnv("exports", exps, value);
   if (value === null) {
     expect(() => resolvePath(".", name)).toThrow();
   } else {
-    expect(resolvePath(".", name)).toBe(path.resolve(dir, value));
+    expect(resolvePath(".", name)).toBe(dest);
   }
   remove();
   // check customize behavior

@@ -185,28 +185,24 @@ describe("findPathInExports", () => {
     ).toBe("./src/tao.cjs");
   });
 
+  // Some nodejs versions allow fuzzy matching dir, some don't
   it("match dir", () => {
-    checkFindPath(
-      "./lib/index/",
-      {
+    expect(
+      findPathInExports("./lib/index/", {
         "./lib/*/": { require: "./src/*/" },
-      },
-      "./src/index/"
-    );
-    checkFindPath(
-      "./lib/index/",
-      {
+      })
+    ).toBe("./src/index/");
+
+    expect(
+      findPathInExports("./lib/index/", {
         "./lib/*": { require: "./src/*" },
-      },
-      null
-    );
-    checkFindPath(
-      "./lib/index/",
-      {
+      })
+    ).toBe(null);
+    expect(
+      findPathInExports("./lib/index/", {
         "./lib/*/": { require: "./src/*" },
-      },
-      null
-    );
+      })
+    ).toBe(null);
   });
 
   it("match priority", () => {

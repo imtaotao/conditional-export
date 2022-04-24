@@ -5,7 +5,8 @@
 
 </div>
 
-Find entry or path in package.json exports. https://nodejs.org/docs/latest-v12.x/api/packages.html#packages_exports
+Find entry or path in package.json exports.
+> https://nodejs.org/docs/latest-v12.x/api/packages.html#packages_exports
 
 
 
