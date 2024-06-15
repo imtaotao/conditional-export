@@ -1,10 +1,10 @@
-import { checkFindPath } from "./utils";
-import { findPathInExports } from "../index";
+import { checkFindPath } from './utils';
+import { findPathInExports } from '../index';
 
-describe("findPathInExports", () => {
-  it("error check", () => {
-    expect(() => findPathInExports("", {})).toThrow();
-    expect(() => findPathInExports("a", {})).toThrow();
+describe('findPathInExports', () => {
+  it('error check', () => {
+    expect(() => findPathInExports('', {})).toThrow();
+    expect(() => findPathInExports('a', {})).toThrow();
     expect(() => findPathInExports(0 as any, {})).toThrow();
     expect(() => findPathInExports(1 as any, {})).toThrow();
     expect(() => findPathInExports(true as any, {})).toThrow();
@@ -13,278 +13,278 @@ describe("findPathInExports", () => {
     expect(() => findPathInExports(undefined as any, {})).toThrow();
   });
 
-  it("path check", () => {
+  it('path check', () => {
     checkFindPath(
-      "./lib",
+      './lib',
       {
-        "./lib": { require: "./src" },
+        './lib': { require: './src' },
       },
-      "./src"
+      './src',
     );
     checkFindPath(
-      "./lib/index",
+      './lib/index',
       {
-        "./lib": { require: "./src" },
+        './lib': { require: './src' },
       },
-      null
+      null,
     );
     checkFindPath(
-      "./lib",
+      './lib',
       {
-        "./lib/a": { require: "./src/a" },
+        './lib/a': { require: './src/a' },
       },
-      null
+      null,
     );
   });
 
-  it("dir check", () => {
+  it('dir check', () => {
     expect(
-      findPathInExports("./lib/", {
-        "./lib/": { require: "./src/" },
-      })
-    ).toBe("./src/");
+      findPathInExports('./lib/', {
+        './lib/': { require: './src/' },
+      }),
+    ).toBe('./src/');
 
     expect(
-      findPathInExports("./lib/", {
-        "./lib": { require: "./src" },
-      })
+      findPathInExports('./lib/', {
+        './lib': { require: './src' },
+      }),
     ).toBe(null);
 
     expect(
-      findPathInExports("./lib/", {
-        "./lib": { require: "./src/" },
-      })
+      findPathInExports('./lib/', {
+        './lib': { require: './src/' },
+      }),
     ).toBe(null);
 
     expect(
-      findPathInExports("./lib/", {
-        "./lib/": { require: "./src" },
-      })
+      findPathInExports('./lib/', {
+        './lib/': { require: './src' },
+      }),
     ).toBe(null);
 
     expect(
-      findPathInExports("./lib/index/", {
-        "./lib/": { require: "./src/" },
-      })
-    ).toBe("./src/index/");
+      findPathInExports('./lib/index/', {
+        './lib/': { require: './src/' },
+      }),
+    ).toBe('./src/index/');
   });
 
-  it("root dir", () => {
+  it('root dir', () => {
     const exports = {
-      "./": "./src/utils/",
+      './': './src/utils/',
     };
-    expect(findPathInExports("./tick.js", exports)).toBe("./src/utils/tick.js");
-    expect(findPathInExports("./a/tick.js", exports)).toBe(
-      "./src/utils/a/tick.js"
+    expect(findPathInExports('./tick.js', exports)).toBe('./src/utils/tick.js');
+    expect(findPathInExports('./a/tick.js', exports)).toBe(
+      './src/utils/a/tick.js',
     );
   });
 
-  it("root match", () => {
+  it('root match', () => {
     const exports = {
-      "./*": "./src/utils/*",
+      './*': './src/utils/*',
     };
-    checkFindPath("./tick.js", exports, "./src/utils/tick.js");
-    checkFindPath("./a/tick.js", exports, "./src/utils/a/tick.js");
+    checkFindPath('./tick.js', exports, './src/utils/tick.js');
+    checkFindPath('./a/tick.js', exports, './src/utils/a/tick.js');
   });
 
-  it("condition export", () => {
+  it('condition export', () => {
     const exports = {
-      "./lib/index": {
-        require: "./src/core.cjs",
-        development: "./src/core.development.js",
-        default: "./src/core.js",
+      './lib/index': {
+        require: './src/core.cjs',
+        development: './src/core.development.js',
+        default: './src/core.js',
       },
     };
-    expect(findPathInExports("./lib/index", exports)).toBe("./src/core.cjs");
-    expect(findPathInExports("./lib/index", exports, ["development"])).toBe(
-      "./src/core.development.js"
+    expect(findPathInExports('./lib/index', exports)).toBe('./src/core.cjs');
+    expect(findPathInExports('./lib/index', exports, ['development'])).toBe(
+      './src/core.development.js',
     );
-    expect(findPathInExports("./lib/index", exports, ["production"])).toBe(
-      "./src/core.js"
+    expect(findPathInExports('./lib/index', exports, ['production'])).toBe(
+      './src/core.js',
     );
   });
 
-  it("nested condition export", () => {
+  it('nested condition export', () => {
     const exports = {
-      "./a": {
+      './a': {
         development: {
-          import: "./feature-node.mjs",
-          require: "./feature-node.cjs",
+          import: './feature-node.mjs',
+          require: './feature-node.cjs',
         },
-        default: "./feature.mjs",
+        default: './feature.mjs',
       },
     };
-    expect(findPathInExports("./a", exports)).toBe("./feature.mjs");
-    expect(findPathInExports("./a", exports, ["development", "require"])).toBe(
-      "./feature-node.cjs"
+    expect(findPathInExports('./a', exports)).toBe('./feature.mjs');
+    expect(findPathInExports('./a', exports, ['development', 'require'])).toBe(
+      './feature-node.cjs',
     );
   });
 
-  it("match", () => {
+  it('match', () => {
     const exports = {
-      "./lib/*": {
-        require: "./src/*.cjs",
-        development: "./src/*.development.js",
-        default: "./src/*.js",
+      './lib/*': {
+        require: './src/*.cjs',
+        development: './src/*.development.js',
+        default: './src/*.js',
       },
     };
-    checkFindPath("./lib/index", exports, "./src/index.cjs");
-    expect(findPathInExports("./lib/index", exports, ["development"])).toBe(
-      "./src/index.development.js"
+    checkFindPath('./lib/index', exports, './src/index.cjs');
+    expect(findPathInExports('./lib/index', exports, ['development'])).toBe(
+      './src/index.development.js',
     );
-    expect(findPathInExports("./lib/index", exports, ["production"])).toBe(
-      "./src/index.js"
+    expect(findPathInExports('./lib/index', exports, ['production'])).toBe(
+      './src/index.js',
     );
   });
 
   // expandability
-  it("multiple * matches", () => {
+  it('multiple * matches', () => {
     expect(
-      findPathInExports("./lib/taox/index", {
-        "./lib/*x*x": { require: "./src/*a*.cjs" },
-      })
-    ).toBe("./src/taoa/inde.cjs");
+      findPathInExports('./lib/taox/index', {
+        './lib/*x*x': { require: './src/*a*.cjs' },
+      }),
+    ).toBe('./src/taoa/inde.cjs');
     expect(
-      findPathInExports("./lib/taox/index", {
-        "./lib/*x/*": { require: "./src/*.cjs*" },
-      })
-    ).toBe("./src/tao.cjsindex");
+      findPathInExports('./lib/taox/index', {
+        './lib/*x/*': { require: './src/*.cjs*' },
+      }),
+    ).toBe('./src/tao.cjsindex');
     expect(
-      findPathInExports("./lib/taox/indexa", {
-        "./lib/*x/*a": { require: "./src/*.cjs*a" },
-      })
-    ).toBe("./src/tao.cjsindexa");
+      findPathInExports('./lib/taox/indexa', {
+        './lib/*x/*a': { require: './src/*.cjs*a' },
+      }),
+    ).toBe('./src/tao.cjsindexa');
     expect(
-      findPathInExports("./lib/taox/indexa", {
-        "./lib/*x/*a": { require: "./src/*.cjs*a*" },
-      })
-    ).toBe("./src/tao.cjsindexa");
+      findPathInExports('./lib/taox/indexa', {
+        './lib/*x/*a': { require: './src/*.cjs*a*' },
+      }),
+    ).toBe('./src/tao.cjsindexa');
     expect(
-      findPathInExports("./lib/taox/index", {
-        "./lib/*x/*": { require: "./src/*.cjs" },
-      })
-    ).toBe("./src/tao.cjs");
+      findPathInExports('./lib/taox/index', {
+        './lib/*x/*': { require: './src/*.cjs' },
+      }),
+    ).toBe('./src/tao.cjs');
     expect(
-      findPathInExports("./lib/taox/index", {
-        "./lib/**x/*": { require: "./src/**.cjs" },
-      })
+      findPathInExports('./lib/taox/index', {
+        './lib/**x/*': { require: './src/**.cjs' },
+      }),
     ).toBe(null);
     expect(
-      findPathInExports("./lib/taox/index", {
-        "./lib/**x/*": { require: "./src/*.cjs" },
-        "./lib/*x/*": { require: "./src/*.mjs" },
-      })
-    ).toBe("./src/tao.mjs");
+      findPathInExports('./lib/taox/index', {
+        './lib/**x/*': { require: './src/*.cjs' },
+        './lib/*x/*': { require: './src/*.mjs' },
+      }),
+    ).toBe('./src/tao.mjs');
     expect(
-      findPathInExports("./lib/taox/index", {
-        "./lib/*x/*": { require: "./src/**.cjs" },
-      })
+      findPathInExports('./lib/taox/index', {
+        './lib/*x/*': { require: './src/**.cjs' },
+      }),
     ).toBe(null);
     expect(
-      findPathInExports("./lib/taox/index", {
-        "./lib/**x/*": { require: "./src/*.cjs" },
-      })
+      findPathInExports('./lib/taox/index', {
+        './lib/**x/*': { require: './src/*.cjs' },
+      }),
     ).toBe(null);
   });
 
   // Some nodejs versions allow fuzzy matching dir, some don't
-  it("match dir", () => {
+  it('match dir', () => {
     expect(
-      findPathInExports("./lib/index/", {
-        "./lib/*/": { require: "./src/*/" },
-      })
-    ).toBe("./src/index/");
+      findPathInExports('./lib/index/', {
+        './lib/*/': { require: './src/*/' },
+      }),
+    ).toBe('./src/index/');
 
     expect(
-      findPathInExports("./lib/index/", {
-        "./lib/*": { require: "./src/*" },
-      })
+      findPathInExports('./lib/index/', {
+        './lib/*': { require: './src/*' },
+      }),
     ).toBe(null);
     expect(
-      findPathInExports("./lib/index/", {
-        "./lib/*/": { require: "./src/*" },
-      })
+      findPathInExports('./lib/index/', {
+        './lib/*/': { require: './src/*' },
+      }),
     ).toBe(null);
   });
 
-  it("match priority", () => {
+  it('match priority', () => {
     const exports = {
-      "./features/*": "./src/features/*.js",
-      "./features/private-internal/*": null,
+      './features/*': './src/features/*.js',
+      './features/private-internal/*': null,
     };
-    checkFindPath("./features/private-internal/m", exports, null);
-    checkFindPath("./features/x", exports, "./src/features/x.js");
+    checkFindPath('./features/private-internal/m', exports, null);
+    checkFindPath('./features/x', exports, './src/features/x.js');
   });
 
-  it("match order(1)", () => {
+  it('match order(1)', () => {
     const exports = {
-      "./*": {
-        require: "./*.js",
-        node: "./*.node.js",
+      './*': {
+        require: './*.js',
+        node: './*.node.js',
       },
     };
-    checkFindPath("./a", exports, "./a.js", ["require", "node"]);
-    checkFindPath("./a", exports, "./a.js", ["node", "require"]);
+    checkFindPath('./a', exports, './a.js', ['require', 'node']);
+    checkFindPath('./a', exports, './a.js', ['node', 'require']);
   });
 
-  it("match order(2)", () => {
+  it('match order(2)', () => {
     const exports = {
-      "./*": {
-        node: "./*.node.js",
-        require: "./*.js",
+      './*': {
+        node: './*.node.js',
+        require: './*.js',
       },
     };
-    checkFindPath("./a", exports, "./a.node.js", ["require", "node"]);
-    checkFindPath("./a", exports, "./a.node.js", ["node", "require"]);
+    checkFindPath('./a', exports, './a.node.js', ['require', 'node']);
+    checkFindPath('./a', exports, './a.node.js', ['node', 'require']);
   });
 
-  it("check cycle key", () => {
+  it('check cycle key', () => {
     const exports = {
-      "./a": {
-        require: "./b",
+      './a': {
+        require: './b',
       },
-      "./b": "./b.js",
+      './b': './b.js',
     };
-    checkFindPath("./a", exports, "./b");
+    checkFindPath('./a', exports, './b');
   });
 
-  it("check node_modules", () => {
+  it('check node_modules', () => {
     checkFindPath(
-      "./a",
+      './a',
       {
-        "./a": "./src/node_modules1/a.js",
+        './a': './src/node_modules1/a.js',
       },
-      "./src/node_modules1/a.js"
+      './src/node_modules1/a.js',
     );
     checkFindPath(
-      "./a",
+      './a',
       {
-        "./a": "./src/node_modules/a.js",
+        './a': './src/node_modules/a.js',
       },
-      null
-    );
-  });
-
-  it("check backtrack", () => {
-    checkFindPath(
-      "./a",
-      {
-        "./a": "./../a.js",
-      },
-      null
-    );
-    checkFindPath(
-      "./a",
-      {
-        "./a": "./b/../a.js",
-      },
-      null
+      null,
     );
   });
 
-  it("deep nested", () => {
+  it('check backtrack', () => {
+    checkFindPath(
+      './a',
+      {
+        './a': './../a.js',
+      },
+      null,
+    );
+    checkFindPath(
+      './a',
+      {
+        './a': './b/../a.js',
+      },
+      null,
+    );
+  });
+
+  it('deep nested', () => {
     const exports = {
-      "./a": {
+      './a': {
         node: {
           require: {
             node: [
@@ -292,7 +292,7 @@ describe("findPathInExports", () => {
                 node: {
                   require: {
                     node: {
-                      require: [{}, "./b.js"],
+                      require: [{}, './b.js'],
                     },
                   },
                 },
@@ -302,12 +302,12 @@ describe("findPathInExports", () => {
         },
       },
     };
-    checkFindPath("./a", exports, "./b.js", ["node", "require"]);
+    checkFindPath('./a', exports, './b.js', ['node', 'require']);
   });
 
-  it("deep nested match", () => {
+  it('deep nested match', () => {
     const exports = {
-      "./a/*": {
+      './a/*': {
         node: {
           require: {
             node: [
@@ -315,7 +315,7 @@ describe("findPathInExports", () => {
                 node: {
                   require: {
                     node: {
-                      require: [{}, "./src/*.js"],
+                      require: [{}, './src/*.js'],
                     },
                   },
                 },
@@ -325,12 +325,12 @@ describe("findPathInExports", () => {
         },
       },
     };
-    checkFindPath("./a/index", exports, "./src/index.js", ["node", "require"]);
+    checkFindPath('./a/index', exports, './src/index.js', ['node', 'require']);
   });
 
-  it("deep nested match", () => {
+  it('deep nested match', () => {
     const exports = {
-      "./a": {
+      './a': {
         node: {
           require: {
             node: [
@@ -338,7 +338,7 @@ describe("findPathInExports", () => {
                 node: {
                   require: {
                     node: {
-                      require: [{}, "b.js"],
+                      require: [{}, 'b.js'],
                     },
                   },
                 },
@@ -348,6 +348,6 @@ describe("findPathInExports", () => {
         },
       },
     };
-    checkFindPath("./a", exports, null, ["node", "require"]);
+    checkFindPath('./a', exports, null, ['node', 'require']);
   });
 });

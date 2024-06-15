@@ -4,6 +4,7 @@ import cleanup from 'rollup-plugin-cleanup';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from 'rollup-plugin-typescript2';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
+import { dependencies } from './package.json';
 
 const outputConfigs = {
   cjs: {
@@ -28,8 +29,9 @@ function createConfig(format, output) {
   let nodePlugins = [];
   const isUmdBuild = /umd/.test(format);
   const input = path.resolve(__dirname, 'src/index.ts')
+  const external = isUmdBuild ? [] : Object.keys(dependencies);
 
-  output.externalLiveBindings = false;
+  output.externalLiveBindings = true;
   if (isUmdBuild) output.name = 'NodePackageExports';
   
   if (format !== 'cjs') {
@@ -42,6 +44,7 @@ function createConfig(format, output) {
   return {
     input,
     output,
+    external,
     plugins: [
       cleanup(),
       json({

@@ -1,23 +1,23 @@
-import * as path from "path";
-import * as fs from "fs-extra";
+import * as path from 'node:path';
+import * as fs from 'fs-extra';
 import {
   Exports,
   Imports,
   findPathInExports,
   findEntryInExports,
-} from "../index";
+} from '../index';
 
 // avoid cache
 let id = 0;
 
 const createNodeTestEnv = (
-  type: "exports" | "imports",
+  type: 'exports' | 'imports',
   obj: Exports | Imports,
-  dest: string | null
+  dest: string | null,
 ) => {
-  const name = "demo" + ++id;
-  const dir = path.resolve(__dirname, "./node_modules", name);
-  const jsonDir = path.resolve(dir, "./package.json");
+  const name = 'demo' + ++id;
+  const dir = path.resolve(__dirname, './node_modules', name);
+  const jsonDir = path.resolve(dir, './package.json');
 
   if (fs.existsSync(dir)) {
     fs.removeSync(dir);
@@ -25,8 +25,8 @@ const createNodeTestEnv = (
   fs.ensureFileSync(jsonDir);
   fs.writeFileSync(jsonDir, JSON.stringify({ name, [type]: obj }, null, 2));
   if (dest !== null) {
-    if (dest.endsWith("/")) {
-      dest = path.resolve(dir, dest, "./index.js"); // Some nodejs versions automatically look for index.js
+    if (dest.endsWith('/')) {
+      dest = path.resolve(dir, dest, './index.js'); // Some nodejs versions automatically look for index.js
       fs.ensureFileSync(dest);
     } else {
       dest = path.resolve(dir, dest);
@@ -48,10 +48,10 @@ export const checkFindPath = (
   input: string,
   exps: Exports,
   value: string | null,
-  conditions?: Array<string>
+  conditions?: Array<string>,
 ) => {
   // check nodeJs behavior
-  const { name, dest, remove } = createNodeTestEnv("exports", exps, value);
+  const { name, dest, remove } = createNodeTestEnv('exports', exps, value);
   if (value === null) {
     expect(() => resolvePath(input, name)).toThrow();
   } else {
@@ -65,14 +65,14 @@ export const checkFindPath = (
 export const checkFindEntry = (
   exps: Exports,
   value: string | null,
-  conditions?: Array<string>
+  conditions?: Array<string>,
 ) => {
   // check nodeJs behavior
-  const { name, dest, remove } = createNodeTestEnv("exports", exps, value);
+  const { name, dest, remove } = createNodeTestEnv('exports', exps, value);
   if (value === null) {
-    expect(() => resolvePath(".", name)).toThrow();
+    expect(() => resolvePath('.', name)).toThrow();
   } else {
-    expect(resolvePath(".", name)).toBe(dest);
+    expect(resolvePath('.', name)).toBe(dest);
   }
   remove();
   // check customize behavior
