@@ -25,7 +25,7 @@ Apis usage description.
 ### findEntryInExports
 
 ```js
-import { findEntryInExports } from 'node-package-exports';
+import { findEntryInExports } from 'conditional-export';
 
 const exports = {
   '.': {
@@ -44,7 +44,7 @@ findEntryInExports(exports, ['production']); // ./index.js
 ### findPathInExports
 
 ```js
-import { findPathInExports } from 'node-package-exports';
+import { findPathInExports } from 'conditional-export';
 
 const exports = {
   './lib/*': {
@@ -64,7 +64,7 @@ Multiple conditions, default conditions is `['require']`.
 > You can specify multiple conditions.
 
 ```js
-import { findPathInExports } from 'node-package-exports';
+import { findPathInExports } from 'conditional-export';
 
 const exports = {
   './a': {
@@ -84,7 +84,7 @@ findPathInExports('./a', exports, ['node', 'require']); // './feature-node.cjs'
 ### findPathInImports
 
 ```js
-import { findPathInImports } from 'node-package-exports';
+import { findPathInImports } from 'conditional-export';
 
 const imports = {
   '#timezones/': './data/timezones/',
@@ -107,7 +107,7 @@ findPathInImports('#moment', imports); // null
 ### findPkgData
 
 ```js
-import { findPkgData } from 'node-package-exports';
+import { findPkgData } from 'conditional-export';
 
 const exports = {
   './': './src/util/',
@@ -129,7 +129,7 @@ const data = findPkgData('@vue/core/timezones/pdt.mjs', exports);
 ### parseModuleId
 
 ```js
-import { parseModuleId } from 'node-package-exports';
+import { parseModuleId } from 'conditional-export';
 
 parseModuleId('vue')
 // {
@@ -162,7 +162,7 @@ parseModuleId('@vue/core@v1.0.0/a.js');
 When you want to convert to absolute path, you can handle it like this.
 
 ```js
-import { findPkgData } from 'node-package-exports';
+import { findPkgData } from 'conditional-export';
 
 const data = findPkgData('vue/src/index.js', exports, ['require', ...]);
 
@@ -183,7 +183,7 @@ if (data.path !== null) {
 <!DOCTYPE html>
 <html lang='en'>
 <body>
-  <script src='https://unpkg.com/node-package-exports/dist/entry.umd.js'></script>
+  <script src='https://unpkg.com/conditional-export/dist/entry.umd.js'></script>
   <script>
     const {
       findPkgData,
