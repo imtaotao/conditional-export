@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       aidly:
-        specifier: ^1.0.1
-        version: 1.0.1
+        specifier: ^1.2.3
+        version: 1.2.3
     devDependencies:
       '@rollup/plugin-commonjs':
         specifier: ^21.0.1
@@ -429,8 +429,8 @@ packages:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
     engines: {node: '>= 6.0.0'}
 
-  aidly@1.0.1:
-    resolution: {integrity: sha512-onoh1YIe9HnxP1wwNZxsc/2Xze+GrSaMtIsiHvisxMp7E4+FsOMxGh3+7WLyTPJq9fjaB4g5BI+LilNV23OESQ==}
+  aidly@1.2.3:
+    resolution: {integrity: sha512-cwuOcOCoQxM/8L5iPfgGGZdlmc/V5Bkx+8OBc3tOXVOi3kAOLrApjZ+CbUamAIWFx681XzyqtFTJWUVuqxkXFw==}
 
   ansi-escapes@4.3.2:
     resolution: {integrity: sha512-gKXj5ALrKWQLsYG9jlTRmR/xKluxHV+Z9QEwNIgCfM1/uwPMCuzVVnh5mwTd+OuBZcwSIMbqssNWRm1lE51QaQ==}
@@ -1399,6 +1399,9 @@ packages:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
 
+  small-queue@1.0.1:
+    resolution: {integrity: sha512-+T/HHAoiyDIyBwR9Utt/0q7WZhWeA6zBf5O+DUs97gJkme9IgX1nkgfa8W5VfF3PWPoZ0dZqjUq6eBFjc4gUsQ==}
+
   source-map-support@0.5.21:
     resolution: {integrity: sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==}
 
@@ -2193,7 +2196,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  aidly@1.0.1: {}
+  aidly@1.2.3:
+    dependencies:
+      small-queue: 1.0.1
 
   ansi-escapes@4.3.2:
     dependencies:
@@ -3338,6 +3343,8 @@ snapshots:
   skip-regex@1.0.2: {}
 
   slash@3.0.0: {}
+
+  small-queue@1.0.1: {}
 
   source-map-support@0.5.21:
     dependencies:

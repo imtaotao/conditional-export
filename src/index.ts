@@ -1,8 +1,11 @@
-import { type BaseType, isNativeValue } from 'aidly';
+import { type PrimitiveType, isPrimitiveValue } from 'aidly';
 
-export type { BaseType } from 'aidly';
+export type { PrimitiveType } from 'aidly';
 export type Imports = Record<string, Exports>;
-export type Exports = BaseType | Array<Exports> | { [key: string]: Exports };
+export type Exports =
+  | PrimitiveType
+  | Array<Exports>
+  | { [key: string]: Exports };
 export type PkgData = ReturnType<typeof findPkgData>;
 export type ModuleIdData = ReturnType<typeof parseModuleId>;
 
@@ -161,7 +164,7 @@ export const findPathInExports = (
   exps: Exports,
   conditions = defaultConditions,
 ) => {
-  if (isNativeValue(exps)) return null;
+  if (isPrimitiveValue(exps)) return null;
   if (Array.isArray(exps)) return null;
   if (path !== '.' && !path.startsWith('./')) {
     throw new SyntaxError(`path "${path}" must be "." or start with "./"`);
@@ -174,7 +177,7 @@ export const findPathInImports = (
   imports: Imports,
   conditions = defaultConditions,
 ) => {
-  if (isNativeValue(imports)) return null;
+  if (isPrimitiveValue(imports)) return null;
   if (Array.isArray(imports)) return null;
   if (!path.startsWith('#')) {
     throw new SyntaxError(`path "${path}" must start with "#"`);
