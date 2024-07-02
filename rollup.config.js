@@ -32,7 +32,7 @@ function createConfig(format, output) {
   const external = isUmdBuild ? [] : Object.keys(dependencies);
 
   output.externalLiveBindings = true;
-  if (isUmdBuild) output.name = 'NodePackageExports';
+  if (isUmdBuild) output.name = 'ConditionalExports';
   
   if (format !== 'cjs') {
     nodePlugins = [

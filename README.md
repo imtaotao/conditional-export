@@ -1,7 +1,7 @@
 <div align='center'>
-<h2>node-package-exports</h2>
+<h2>conditional-export</h2>
 
-[![NPM version](https://img.shields.io/npm/v/node-package-exports.svg?color=a1b858&label=)](https://www.npmjs.com/package/node-package-exports)
+[![NPM version](https://img.shields.io/npm/v/conditional-export.svg?color=a1b858&label=)](https://www.npmjs.com/package/conditional-export)
 
 </div>
 
@@ -18,6 +18,9 @@ Find entry or path in package.json exports or imports.
 ## Usage
 
 Apis usage description.
+
+> Debugging platform: https://imtaotao.github.io/conditional-export/
+
 
 ### findEntryInExports
 

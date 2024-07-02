@@ -1,6 +1,6 @@
 {
-  "name": "node-package-exports",
-  "version": "1.1.0",
+  "name": "conditional-export",
+  "version": "1.0.0",
   "sideEffects": false,
   "description": "find node package entry or path in exports",
   "types": "./dist/index.d.ts",
@@ -22,6 +22,7 @@
   },
   "author": "imtaotao",
   "keywords": [
+    "conditional",
     "exports",
     "imports",
     "node",

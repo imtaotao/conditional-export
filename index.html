@@ -3,24 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Node package exports</title>
+  <title>Conditional exports</title>
 </head>
 <body>
-  <script src="./dist/entry.umd.js"></script>
+  <div>Please open the console for debugging. (请打开控制台进行调试)</div>
+  <script src="https://unpkg.com/conditional-export/dist/entry.umd.js"></script>
   <script>
-    const {
-      parseModuleId,
-      findPkgData,
-      findPathInImports,
-      findPathInExports,
-      findEntryInExports,
-    } = NodePackageExports;
-  </script>
-  <script>
+    Object.assign(window, window.ConditionalExports);
+    console.log('All APIs have been placed on the window and can be used directly, such as `window.clone({})`.');
+    console.log('所有的 API 都已经放在 window 上，可以直接使用，比如 `window.clone({})`。');
+    console.log(window.ConditionalExports);
+
     const exports = {
       "./lib/*/": { require: "./src/*/" },
     }
-    console.log(findPathInExports("./lib/index/index.js", exports)); 
+    const res = findPathInExports("./lib/log/index.js", exports);
+    console.log(res); 
   </script>
 </body>
 </html>
