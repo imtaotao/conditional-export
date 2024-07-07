@@ -1,10 +1,13 @@
-import path from 'path';
+import path from 'node:path';
+import ts from "typescript";
 import json from '@rollup/plugin-json';
 import cleanup from 'rollup-plugin-cleanup';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from 'rollup-plugin-typescript2';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-import { dependencies } from './package.json';
+import pkg from "./package.json" assert { type: "json" };
+
+const { dirname: __dirname } = import.meta;
 
 const outputConfigs = {
   cjs: {
@@ -29,7 +32,7 @@ function createConfig(format, output) {
   let nodePlugins = [];
   const isUmdBuild = /umd/.test(format);
   const input = path.resolve(__dirname, 'src/index.ts')
-  const external = isUmdBuild ? [] : Object.keys(dependencies);
+  const external = isUmdBuild ? [] : Object.keys(pkg.dependencies);
 
   output.externalLiveBindings = true;
   if (isUmdBuild) output.name = 'ConditionalExports';
@@ -52,7 +55,7 @@ function createConfig(format, output) {
       }),
       typescript({
         clean: true, // no cache
-        typescript: require('typescript'),
+        typescript: ts,
         tsconfig: path.resolve(__dirname, './tsconfig.json'),
       }),
       ...nodePlugins,
