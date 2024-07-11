@@ -47,6 +47,7 @@
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
     "@types/fs-extra": "^9.0.13",
     "@types/jest": "^27.4.0",
     "fs-extra": "^10.1.0",

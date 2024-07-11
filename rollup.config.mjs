@@ -1,11 +1,12 @@
 import path from 'node:path';
 import ts from "typescript";
 import json from '@rollup/plugin-json';
+import terser from '@rollup/plugin-terser';
 import cleanup from 'rollup-plugin-cleanup';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from 'rollup-plugin-typescript2';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-import pkg from "./package.json" assert { type: "json" };
+import pkg from "./package.json" with { type: "json" };
 
 const { dirname: __dirname } = import.meta;
 
@@ -36,7 +37,7 @@ function createConfig(format, output) {
 
   output.externalLiveBindings = true;
   if (isUmdBuild) output.name = 'ConditionalExports';
-  
+
   if (format !== 'cjs') {
     nodePlugins = [
       nodeResolve({ browser: isUmdBuild }),
@@ -50,6 +51,7 @@ function createConfig(format, output) {
     external,
     plugins: [
       cleanup(),
+      terser(),
       json({
         namedExports: false,
       }),
