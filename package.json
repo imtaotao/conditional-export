@@ -1,6 +1,7 @@
 {
   "name": "conditional-export",
   "version": "1.0.1",
+  "type": "module",
   "sideEffects": false,
   "description": "find node package entry or path in exports",
   "types": "./dist/index.d.ts",
@@ -9,9 +10,14 @@
   "module": "./dist/entry.esm-bundler.js",
   "exports": {
     ".": {
-      "import": "./dist/entry.esm-bundler.js",
-      "require": "./dist/entry.cjs.js",
-      "types": "./dist/index.d.ts"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/entry.esm-bundler.js"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/entry.cjs.js"
+      }
     }
   },
   "files": ["dist"],
@@ -47,6 +53,7 @@
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
     "@types/fs-extra": "^9.0.13",
     "@types/jest": "^27.4.0",
     "fs-extra": "^10.1.0",
