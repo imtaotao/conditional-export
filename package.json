@@ -20,7 +20,7 @@
       }
     }
   },
-  "files": ["dist"],
+  "files": ["./index.mjs", "dist"],
   "scripts": {
     "test": "jest",
     "build": "rimraf ./dist && rollup --config && rimraf ./dist/__tests__",
