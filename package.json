@@ -1,7 +1,6 @@
 {
   "name": "conditional-export",
   "version": "1.0.2",
-  "type": "commonjs",
   "sideEffects": false,
   "description": "find node package entry or path in exports",
   "types": "./dist/index.d.ts",
