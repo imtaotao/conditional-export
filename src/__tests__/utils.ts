@@ -15,6 +15,7 @@ const createNodeTestEnv = (
   obj: Exports | Imports,
   dest: string | null,
 ) => {
+  removeAll();
   const name = 'demo' + ++id;
   const dir = path.resolve(__dirname, './node_modules', name);
   const jsonDir = path.resolve(dir, './package.json');
@@ -67,7 +68,7 @@ export const checkFindEntry = (
   value: string | null,
   conditions?: Array<string>,
 ) => {
-  // check nodeJs behavior
+  // check NodeJS behavior
   const { name, dest, remove } = createNodeTestEnv('exports', exps, value);
   if (value === null) {
     expect(() => resolvePath('.', name)).toThrow();
@@ -77,4 +78,11 @@ export const checkFindEntry = (
   remove();
   // check customize behavior
   expect(findEntryInExports(exps, conditions)).toBe(value);
+};
+
+export const removeAll = () => {
+  const dir = path.resolve(__dirname, './node_modules');
+  if (fs.existsSync(dir)) {
+    fs.removeSync(dir);
+  }
 };

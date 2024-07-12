@@ -1,7 +1,10 @@
 import { findPkgData } from '../index';
+import { removeAll } from './utils';
 
 // https://github.com/jkrems/proposal-pkg-exports#1-exports-field
 describe('findPkgData', () => {
+  beforeAll(removeAll);
+
   it('pkg data', () => {
     const exports = {
       './': './src/util/',

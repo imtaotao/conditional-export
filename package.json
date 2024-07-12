@@ -1,6 +1,6 @@
 {
   "name": "conditional-export",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "sideEffects": false,
   "description": "find node package entry or path in exports",
   "types": "./dist/index.d.ts",
@@ -21,9 +21,9 @@
   },
   "files": ["./index.mjs", "dist"],
   "scripts": {
-    "test": "jest",
     "build": "rimraf ./dist && rollup --config && rimraf ./dist/__tests__",
-    "format": "prettier --write --parser typescript \"(src|dist)/**/*.(js|ts?(x))\""
+    "format": "prettier --write --parser typescript \"(src|dist)/**/*.(js|ts?(x))\"",
+    "test": "jest findEntry && jest findPath && jest findPathInImport && jest findPkgData && jest parseModuleId"
   },
   "author": "imtaotao",
   "keywords": [
