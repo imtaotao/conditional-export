@@ -1,6 +1,6 @@
 {
   "name": "conditional-export",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "sideEffects": false,
   "description": "find node package entry or path in exports",
   "types": "./dist/index.d.ts",
@@ -11,7 +11,8 @@
     ".": {
       "import": {
         "types": "./dist/index.d.ts",
-        "default": "./index.mjs"
+        "node": "./dist/entry.esm-bundler.mjs",
+        "default": "./dist/entry.esm-bundler.js"
       },
       "require": {
         "types": "./dist/index.d.ts",
@@ -19,10 +20,10 @@
       }
     }
   },
-  "files": ["./index.mjs", "dist"],
+  "files": ["dist"],
   "scripts": {
     "build": "rimraf ./dist && rollup --config && rimraf ./dist/__tests__",
-    "format": "prettier --write --parser typescript \"(src|dist)/**/*.(js|ts?(x))\"",
+    "format": "prettier --write --parser typescript \"(src|dist)/**/*.((m)?js|ts?(x))\"",
     "test": "jest findEntry && jest findPath && jest findPathInImport && jest findPkgData && jest parseModuleId"
   },
   "author": "imtaotao",
@@ -66,6 +67,6 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
-    "aidly": "^1.4.5"
+    "aidly": "^1.4.6"
   }
 }

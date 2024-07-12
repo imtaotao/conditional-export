@@ -15,9 +15,13 @@ const outputConfigs = {
     format: 'cjs',
     file: path.resolve(__dirname, 'dist/entry.cjs.js'),
   },
-  'esm-bundler': {
+  'esm-bundler-js': {
     format: 'es',
     file: path.resolve(__dirname, 'dist/entry.esm-bundler.js'),
+  },
+  'esm-bundler-mjs': {
+    format: 'es',
+    file: path.resolve(__dirname, 'dist/entry.esm-bundler.mjs'),
   },
   umd: {
     format: 'umd',
