@@ -3,7 +3,7 @@
     "baseUrl": ".",
     "outDir": "dist",
     "module": "ESNext",
-    "target": "es6",
+    "target": "ESNext",
     "strict": true,
     "resolveJsonModule": true,
     "lib": ["es2018", "dom"],
