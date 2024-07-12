@@ -2,31 +2,31 @@ import path from 'node:path';
 import ts from "typescript";
 import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
-import cleanup from 'rollup-plugin-cleanup';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from 'rollup-plugin-typescript2';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
+
 import pkg from "./package.json" with { type: "json" };
 
 const { dirname: __dirname } = import.meta;
 
+const createOutput = (type, ext = 'js') => {
+  const match = pkg[type].match(/(?<=entry\.)(.*)(?=\.)/)[0];
+  const entry = match === 'esm-bundler' ? `${match}-${ext}` : match;
+
+  return {
+    [entry]: {
+      format: match === 'esm-bundler' ? 'es' : match,
+      file: path.resolve(__dirname, `dist/entry.${match}.${ext}`),
+    }
+  }
+}
+
 const outputConfigs = {
-  cjs: {
-    format: 'cjs',
-    file: path.resolve(__dirname, 'dist/entry.cjs.js'),
-  },
-  'esm-bundler-js': {
-    format: 'es',
-    file: path.resolve(__dirname, 'dist/entry.esm-bundler.js'),
-  },
-  'esm-bundler-mjs': {
-    format: 'es',
-    file: path.resolve(__dirname, 'dist/entry.esm-bundler.mjs'),
-  },
-  umd: {
-    format: 'umd',
-    file: path.resolve(__dirname, 'dist/entry.umd.js'),
-  },
+  ...createOutput('main'),
+  ...createOutput('module'),
+  ...createOutput('module', 'mjs'),
+  ...createOutput('unpkg'),
 };
 
 const packageConfigs = Object.keys(outputConfigs).map((format) =>
@@ -54,7 +54,6 @@ function createConfig(format, output) {
     output,
     external,
     plugins: [
-      cleanup(),
       terser(),
       json({
         namedExports: false,
@@ -62,7 +61,7 @@ function createConfig(format, output) {
       typescript({
         clean: true, // no cache
         typescript: ts,
-        tsconfig: path.resolve(__dirname, './tsconfig.json'),
+        tsconfig: path.resolve(__dirname, './tsconfig.build.json'),
       }),
       ...nodePlugins,
     ],
