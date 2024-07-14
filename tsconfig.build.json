@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "dist",
+    "module": "ESNext",
+    "target": "ESNext",
+    "strict": true,
+    "resolveJsonModule": true,
+    "lib": ["es2018", "dom"],
+    "moduleResolution": "node",
+    "declaration": true,
+    "noImplicitThis": true,
+    "esModuleInterop": true
+  },
+  "include": ["src"],
+  "exclude": ["src/__tests__"]
+}
