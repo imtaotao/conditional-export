@@ -33,7 +33,6 @@ const matchCondition = (
   if (exps === null) {
     return null;
   }
-
   if (typeof exps === 'string') {
     if (!data || !data.length) {
       return valid(exps, isExps);
@@ -47,7 +46,6 @@ const matchCondition = (
     }
     return valid(result, isExps);
   }
-
   if (Array.isArray(exps)) {
     for (const val of exps) {
       const result = matchCondition(val, conditions, isExps, data);
@@ -55,7 +53,6 @@ const matchCondition = (
     }
     return null;
   }
-
   if (typeof exps === 'object') {
     let result;
     for (const key of Object.keys(exps)) {
@@ -74,36 +71,26 @@ const fuzzyMatchKey = (path: string, obj: Imports) => {
   const pathLen = path.length;
   const keys = Object.keys(obj).sort((a, b) => b.length - a.length);
   const data = [];
-
   let prefix;
   let matched;
 
   for (const key of keys) {
     if (matched) break;
 
-    // path index
-    let i = 0;
-
-    // key index
-    let j = 0;
+    let i = 0; // path index
+    let j = 0; // key index
 
     for (i = 0; i < pathLen; i++) {
       if (path[i] === key[j]) {
         j++;
       } else if (key[j] === '*') {
         const next = key[j + 1];
-        // '**' is invalid
-        if (next === '*') break;
-        // get index of next char
-        const k = !next ? pathLen : path.indexOf(next, i + 1);
-        // exit early
-        if (k === -1) break;
-        // extract '*' replacement
-        data.push(path.slice(i, k));
-        // step to next char in key
-        j += 2;
-        // step to next char in path
-        i = k;
+        if (next === '*') break; // '**' is invalid
+        const k = !next ? pathLen : path.indexOf(next, i + 1); // get index of next char
+        if (k === -1) break; // exit early
+        data.push(path.slice(i, k)); // extract '*' replacement
+        j += 2; // step to next char in key
+        i = k; // step to next char in path
       } else {
         break;
       }

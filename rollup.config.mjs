@@ -5,7 +5,6 @@ import terser from '@rollup/plugin-terser';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from 'rollup-plugin-typescript2';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-
 import pkg from "./package.json" with { type: "json" };
 
 const { dirname: __dirname } = import.meta;
@@ -13,7 +12,6 @@ const { dirname: __dirname } = import.meta;
 const createOutput = (type, ext = 'js') => {
   const match = pkg[type].match(/(?<=entry\.)(.*)(?=\.)/)[0];
   const entry = match === 'esm-bundler' ? `${match}-${ext}` : match;
-
   return {
     [entry]: {
       format: match === 'esm-bundler' ? 'es' : match,
