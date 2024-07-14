@@ -76,7 +76,6 @@ const fuzzyMatchKey = (path: string, obj: Imports) => {
 
   for (const key of keys) {
     if (matched) break;
-
     let i = 0; // path index
     let j = 0; // key index
 
