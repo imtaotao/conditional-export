@@ -84,12 +84,12 @@ const fuzzyMatchKey = (path: string, obj: Imports) => {
         j++;
       } else if (key[j] === '*') {
         const next = key[j + 1];
-        if (next === '*') break; // '**' is invalid
-        const k = !next ? pathLen : path.indexOf(next, i + 1); // get index of next char
-        if (k === -1) break; // exit early
-        data.push(path.slice(i, k)); // extract '*' replacement
+        if (next === '*') break; // `**` is invalid
+        const idx = !next ? pathLen : path.indexOf(next, i + 1); // get index of next char
+        if (idx === -1) break; // exit early
+        data.push(path.slice(i, idx)); // extract `*` replacement
         j += 2; // step to next char in key
-        i = k; // step to next char in path
+        i = idx; // step to next char in path
       } else {
         break;
       }

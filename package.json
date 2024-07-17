@@ -1,6 +1,6 @@
 {
   "name": "conditional-export",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "sideEffects": false,
   "description": "find node package entry or path in exports",
   "types": "./dist/index.d.ts",
@@ -68,6 +68,6 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
-    "aidly": "^1.4.6"
+    "aidly": "^1.4.8"
   }
 }
